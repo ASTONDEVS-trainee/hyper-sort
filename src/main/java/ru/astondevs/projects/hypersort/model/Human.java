@@ -49,4 +49,13 @@ public class Human {
             }
         }
     }
+
+    @Override
+    public String toString() {
+        return "Human{" +
+                "gender='" + gender + '\'' +
+                ", age=" + age +
+                ", lastName='" + lastName + '\'' +
+                '}';
+    }
 }
