@@ -1,6 +1,8 @@
 package ru.astondevs.projects.hypersort.model;
 
-public class Animal {
+import java.util.Objects;
+
+public class Animal implements Comparable<Animal> {
     private final String species;
     private final String eyeColor;
     private final boolean hasFur;
@@ -44,6 +46,26 @@ public class Animal {
                 throw new IllegalArgumentException("The field should not be empty");
             }
         }
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(species, eyeColor, hasFur);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof Animal other)) return false;
+        return hasFur == other.hasFur &&
+                Objects.equals(species, other.species) &&
+                Objects.equals(eyeColor, other.eyeColor);
+    }
+
+    @Override
+    public int compareTo(Animal o) {
+        int result = this.species.compareTo(o.species);
+        return result != 0 ? result : this.eyeColor.compareTo(o.eyeColor);
     }
 
     @Override
