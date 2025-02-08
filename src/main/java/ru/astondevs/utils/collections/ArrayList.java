@@ -2,6 +2,7 @@ package ru.astondevs.utils.collections;
 
 
 import java.util.Arrays;
+import java.util.Objects;
 
 public final class ArrayList<T> {
     private Object[] elements;
@@ -10,6 +11,15 @@ public final class ArrayList<T> {
 
     public ArrayList() {
         this.elements = new Object[DEFAULT_CAPACITY];
+        this.size = 0;
+    }
+
+    public ArrayList(int initialCapacity) {
+        if (initialCapacity <= 0) {
+            throw new IllegalArgumentException("Capacity must be greater than zero.");
+        }
+        this.elements = new Object[initialCapacity];
+        this.size = 0;
     }
 
     public void add(T element) {
@@ -29,12 +39,16 @@ public final class ArrayList<T> {
     }
 
     public boolean contains(T element) {
+        return indexOf(element) >= 0;
+    }
+
+    public int indexOf(T element) {
         for (int i = 0; i < size; i++) {
-            if (elements[i].equals(element)) {
-                return true;
+            if (Objects.equals(elements[i], element)) {
+                return i;
             }
         }
-        return false;
+        return -1;
     }
 
     public int size() {
