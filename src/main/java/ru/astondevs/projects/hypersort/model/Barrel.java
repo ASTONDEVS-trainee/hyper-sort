@@ -1,7 +1,9 @@
 package ru.astondevs.projects.hypersort.model;
 
 
-public class Barrel {
+import java.util.Objects;
+
+public class Barrel implements Comparable<Barrel> {
     private final Integer volume;
     private final String storedMaterial;
     private final String material;
@@ -18,7 +20,7 @@ public class Barrel {
         private String material;
 
         public Builder setVolume(Integer volume) {
-            if (volume <= 0) {
+            if (volume == null || volume <= 0) {
                 throw new IllegalArgumentException("Volume must be greater than ZERO(0)");
             }
             this.volume = volume;
@@ -49,6 +51,25 @@ public class Barrel {
             }
         }
 
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(volume, storedMaterial, material);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof Barrel other)) return false;
+        return Objects.equals(volume, other.volume) &&
+                Objects.equals(storedMaterial, other.storedMaterial) &&
+                Objects.equals(material, other.material);
+    }
+
+    @Override
+    public int compareTo(Barrel o) {
+        return Integer.compare(this.volume, o.volume);
     }
 
     @Override

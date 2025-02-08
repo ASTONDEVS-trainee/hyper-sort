@@ -1,7 +1,9 @@
 package ru.astondevs.projects.hypersort.model;
 
 
-public class Human {
+import java.util.Objects;
+
+public class Human implements Comparable<Human> {
     private final String gender;
     private final Integer age;
     private final String lastName;
@@ -23,8 +25,8 @@ public class Human {
         }
 
         public Builder setAge(Integer age) {
-            if (age < 0) {
-                throw new IllegalArgumentException("Age cannot be negative");
+            if (age <= 0) {
+                throw new IllegalArgumentException("Age cannot be ZERO(0) or negative");
             }
             this.age = age;
             return this;
@@ -48,6 +50,26 @@ public class Human {
                 throw new IllegalArgumentException("Last name cannot be empty");
             }
         }
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(gender, age, lastName);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof Human other)) return false;
+        return Objects.equals(age, other.age) &&
+                Objects.equals(gender, other.gender) &&
+                Objects.equals(lastName, other.lastName);
+    }
+
+    @Override
+    public int compareTo(Human o) {
+        int result = Integer.compare(this.age, o.age);
+        return result != 0 ? result : this.lastName.compareTo(o.lastName);
     }
 
     @Override
