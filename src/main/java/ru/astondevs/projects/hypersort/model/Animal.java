@@ -1,8 +1,11 @@
 package ru.astondevs.projects.hypersort.model;
 
+import ru.astondevs.interfaces.Validator;
+
+import java.util.Comparator;
 import java.util.Objects;
 
-public class Animal implements Comparable<Animal> {
+public class Animal implements Comparable<Animal>, Validator {
     private final String species;
     private final String eyeColor;
     private final boolean hasFur;
@@ -11,6 +14,55 @@ public class Animal implements Comparable<Animal> {
         this.species = builder.species;
         this.eyeColor = builder.eyeColor;
         this.hasFur = builder.hasFur;
+    }
+
+    public String getSpecies() {
+        return species;
+    }
+
+    public String getEyeColor() {
+        return eyeColor;
+    }
+
+    public boolean isHasFur() {
+        return hasFur;
+    }
+
+    @Override
+    public boolean validate() {
+        return species != null && !species.isBlank() &&
+                eyeColor != null && !eyeColor.isBlank();
+    }
+
+    @Override
+    public String toString() {
+        return "species: " + species + "\n" +
+                "eyeColor: " + eyeColor + "\n" +
+                "hasFur: " + hasFur + "\n" +
+                "--------------------------------------------------------------------------------";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Animal animal = (Animal) o;
+        return hasFur == animal.hasFur &&
+                Objects.equals(species, animal.species) &&
+                Objects.equals(eyeColor, animal.eyeColor);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(species, eyeColor, hasFur);
+    }
+
+    @Override
+    public int compareTo(Animal other) {
+        return Comparator.comparing(Animal::getSpecies)
+                .thenComparing(Animal::getEyeColor)
+                .thenComparing(Animal::isHasFur)
+                .compare(this, other);
     }
 
     public static class Builder {
@@ -34,46 +86,11 @@ public class Animal implements Comparable<Animal> {
         }
 
         public Animal build() {
-            validate();
-            return new Animal(this);
-        }
-
-        private void validate() {
-            if (species == null || species.isEmpty()) {
-                throw new IllegalArgumentException("The field should not be empty");
+            Animal animal = new Animal(this);
+            if (!animal.validate()) {
+                throw new IllegalArgumentException("Validation is not passed");
             }
-            if (eyeColor == null || eyeColor.isEmpty()) {
-                throw new IllegalArgumentException("The field should not be empty");
-            }
+            return animal;
         }
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(species, eyeColor, hasFur);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (!(obj instanceof Animal other)) return false;
-        return hasFur == other.hasFur &&
-                Objects.equals(species, other.species) &&
-                Objects.equals(eyeColor, other.eyeColor);
-    }
-
-    @Override
-    public int compareTo(Animal o) {
-        int result = this.species.compareTo(o.species);
-        return result != 0 ? result : this.eyeColor.compareTo(o.eyeColor);
-    }
-
-    @Override
-    public String toString() {
-        return "Animal{" +
-                "species='" + species + '\'' +
-                ", eyeColor='" + eyeColor + '\'' +
-                ", hasFur=" + hasFur +
-                '}';
     }
 }

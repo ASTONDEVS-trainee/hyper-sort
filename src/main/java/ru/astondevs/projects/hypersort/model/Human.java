@@ -1,9 +1,12 @@
 package ru.astondevs.projects.hypersort.model;
 
 
+import ru.astondevs.interfaces.Validator;
+
+import java.util.Comparator;
 import java.util.Objects;
 
-public class Human implements Comparable<Human> {
+public class Human implements Comparable<Human>, Validator {
     private final String gender;
     private final Integer age;
     private final String lastName;
@@ -12,6 +15,56 @@ public class Human implements Comparable<Human> {
         this.gender = builder.gender;
         this.age = builder.age;
         this.lastName = builder.lastName;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public Integer getAge() {
+        return age;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    @Override
+    public boolean validate() {
+        return age != null && age > 0 &&
+                gender != null && !gender.isBlank() &&
+                lastName != null && !lastName.isBlank();
+    }
+
+    @Override
+    public String toString() {
+        return "gender: " + gender + "\n" +
+                "age: " + age + "\n" +
+                "lastName: " + lastName + "\n" +
+                "--------------------------------------------------------------------------------";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Human human = (Human) o;
+        return Objects.equals(gender, human.gender) &&
+                Objects.equals(age, human.age) &&
+                Objects.equals(lastName, human.lastName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(gender, age, lastName);
+    }
+
+    @Override
+    public int compareTo(Human o) {
+        return Comparator.comparing(Human::getGender)
+                .thenComparing(Human::getAge)
+                .thenComparing(Human::getLastName)
+                .compare(this, o);
     }
 
     public static class Builder {
@@ -25,9 +78,6 @@ public class Human implements Comparable<Human> {
         }
 
         public Builder setAge(Integer age) {
-            if (age <= 0) {
-                throw new IllegalArgumentException("Age cannot be ZERO(0) or negative");
-            }
             this.age = age;
             return this;
         }
@@ -38,46 +88,11 @@ public class Human implements Comparable<Human> {
         }
 
         public Human build() {
-            validate();
-            return new Human(this);
-        }
-
-        private void validate() {
-            if (gender == null || gender.isEmpty()) {
-                throw new IllegalArgumentException("Gender cannot be empty");
+            Human human = new Human(this);
+            if (!human.validate()) {
+                throw new IllegalArgumentException("Validation is not passed");
             }
-            if (lastName == null || lastName.isEmpty()) {
-                throw new IllegalArgumentException("Last name cannot be empty");
-            }
+            return human;
         }
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(gender, age, lastName);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (!(obj instanceof Human other)) return false;
-        return Objects.equals(age, other.age) &&
-                Objects.equals(gender, other.gender) &&
-                Objects.equals(lastName, other.lastName);
-    }
-
-    @Override
-    public int compareTo(Human o) {
-        int result = Integer.compare(this.age, o.age);
-        return result != 0 ? result : this.lastName.compareTo(o.lastName);
-    }
-
-    @Override
-    public String toString() {
-        return "Human{" +
-                "gender='" + gender + '\'' +
-                ", age=" + age +
-                ", lastName='" + lastName + '\'' +
-                '}';
     }
 }
