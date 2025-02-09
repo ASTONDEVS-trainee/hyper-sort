@@ -4,26 +4,17 @@ import java.util.*;
 
     public final class DataWriter {
 
-        private ArrayList array;
-        private Integer index;
-        private String path;
-        private Boolean append = true;
+        private static byte[] textBytes;
+        private static Integer index;
+        private static String path;
+        private static Boolean append = true;
 
-
-        private DataWriter (String path, Boolean append){
+        private DataOutput (String path, Boolean append) {
             this.path = path;
             this.append = append;
-
         }
 
-        public static ArrayList writeArray (ArrayList array){
-            writeArray(array);
-            return array;
-        }
-
-        public static Integer writeIndex (Integer index){
-            writeIndex(index);
-            return index;
+        public static byte[] getTextBytes() {
+            return textBytes;
         }
     }
-
