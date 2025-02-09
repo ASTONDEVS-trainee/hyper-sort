@@ -1,9 +1,12 @@
 package ru.astondevs.projects.hypersort.model;
 
 
+import ru.astondevs.interfaces.Validator;
+
+import java.util.Comparator;
 import java.util.Objects;
 
-public class Barrel implements Comparable<Barrel> {
+public class Barrel implements Comparable<Barrel>, Validator {
     private final Integer volume;
     private final String storedMaterial;
     private final String material;
@@ -14,15 +17,63 @@ public class Barrel implements Comparable<Barrel> {
         this.material = builder.material;
     }
 
+    public Integer getVolume() {
+        return volume;
+    }
+
+    public String getStoredMaterial() {
+        return storedMaterial;
+    }
+
+    public String getMaterial() {
+        return material;
+    }
+
+    @Override
+    public boolean validate() {
+        return volume != null && volume > 0 &&
+                storedMaterial != null && !storedMaterial.isBlank() &&
+                material != null && !material.isBlank();
+    }
+
+    @Override
+    public String toString() {
+        return "volume: " + volume + "\n" +
+                "storedMaterial: " + storedMaterial + "\n" +
+                "material: " + material + "\n" +
+                "--------------------------------------------------------------------------------";
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Barrel barrel = (Barrel) o;
+        return Objects.equals(volume, barrel.volume) &&
+                Objects.equals(storedMaterial, barrel.storedMaterial) &&
+                Objects.equals(material, barrel.material);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(volume, storedMaterial, material);
+    }
+
+    @Override
+    public int compareTo(Barrel other) {
+        return Comparator.comparing(Barrel::getVolume)
+                .thenComparing(Barrel::getStoredMaterial)
+                .thenComparing(Barrel::getMaterial)
+                .compare(this, other);
+    }
+
     public static class Builder {
         private Integer volume;
         private String storedMaterial;
         private String material;
 
         public Builder setVolume(Integer volume) {
-            if (volume == null || volume <= 0) {
-                throw new IllegalArgumentException("Volume must be greater than ZERO(0)");
-            }
             this.volume = volume;
             return this;
         }
@@ -38,46 +89,12 @@ public class Barrel implements Comparable<Barrel> {
         }
 
         public Barrel build() {
-            validate();
-            return new Barrel(this);
-        }
-
-        private void validate() {
-            if (storedMaterial == null || storedMaterial.isEmpty()) {
-                throw new IllegalArgumentException("Stored material cannot be empty");
+            Barrel barrel = new Barrel(this);
+            if (!barrel.validate()) {
+                throw new IllegalArgumentException("Validation is not passed");
             }
-            if (material == null || material.isEmpty()) {
-                throw new IllegalArgumentException("Material cannot be empty");
-            }
+            return barrel;
         }
-
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(volume, storedMaterial, material);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (!(obj instanceof Barrel other)) return false;
-        return Objects.equals(volume, other.volume) &&
-                Objects.equals(storedMaterial, other.storedMaterial) &&
-                Objects.equals(material, other.material);
-    }
-
-    @Override
-    public int compareTo(Barrel o) {
-        return Integer.compare(this.volume, o.volume);
-    }
-
-    @Override
-    public String toString() {
-        return "Barrel{" +
-                "volume=" + volume +
-                ", storedMaterial='" + storedMaterial + '\'' +
-                ", material='" + material + '\'' +
-                '}';
     }
 }
+
