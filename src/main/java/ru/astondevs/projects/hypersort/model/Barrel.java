@@ -1,12 +1,10 @@
 package ru.astondevs.projects.hypersort.model;
 
-
-import ru.astondevs.interfaces.Validator;
-
 import java.util.Comparator;
 import java.util.Objects;
 
-public class Barrel implements Comparable<Barrel>, Validator {
+
+public class Barrel extends CollectionObject implements Comparable<Barrel> {
     private final Integer volume;
     private final String storedMaterial;
     private final String material;
