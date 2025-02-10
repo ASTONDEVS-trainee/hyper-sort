@@ -3,7 +3,7 @@ package ru.astondevs.utils.io;
 import ru.astondevs.projects.hypersort.model.Human;
 import ru.astondevs.projects.hypersort.model.Barrel;
 import ru.astondevs.projects.hypersort.model.Animal;
-import ru.astondevs.utils.collections.ArrayList;
+import ru.astondevs.utils.collections.ObjectList;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -11,8 +11,8 @@ import java.io.IOException;
 
 public class DataReader {
 
-    public static <T extends Comparable<T>> ArrayList<T> readFromFile(String fileName, Class<T> myClass) {
-        ArrayList<T> objects = new ArrayList<>();
+    public static <T extends Comparable<T>> ObjectList<T> readFromFile(String fileName, Class<T> myClass) {
+        ObjectList<T> objects = new ObjectList<>();
 
         try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
             Object builder = createBuilder(myClass.getSimpleName());
