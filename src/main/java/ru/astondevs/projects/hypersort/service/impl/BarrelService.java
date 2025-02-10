@@ -3,7 +3,7 @@ package ru.astondevs.projects.hypersort.service.impl;
 import ru.astondevs.projects.hypersort.model.CollectionObject;
 import ru.astondevs.projects.hypersort.model.Barrel;
 import ru.astondevs.projects.hypersort.service.AbstractService;
-import ru.astondevs.utils.collections.ArrayList;
+import ru.astondevs.utils.collections.ObjectList;
 
 
 public class BarrelService extends AbstractService<Barrel> {
@@ -21,12 +21,12 @@ public class BarrelService extends AbstractService<Barrel> {
     }
 
     @Override
-    public ArrayList<Barrel> getObjects() {
+    public ObjectList<Barrel> getObjects() {
         return container;
     }
 
     @Override
-    public ArrayList<Barrel> getSortedObjects() {
+    public ObjectList<Barrel> getSortedObjects() {
         return container;
     }
 

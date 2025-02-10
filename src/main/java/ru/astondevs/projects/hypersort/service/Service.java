@@ -4,7 +4,7 @@ import ru.astondevs.projects.hypersort.model.CollectionObject;
 import ru.astondevs.projects.hypersort.service.impl.AnimalService;
 import ru.astondevs.projects.hypersort.service.impl.BarrelService;
 import ru.astondevs.projects.hypersort.service.impl.HumanService;
-import ru.astondevs.utils.collections.ArrayList;
+import ru.astondevs.utils.collections.ObjectList;
 
 
 public interface Service {
@@ -25,9 +25,9 @@ public interface Service {
 
     void writeSortedObjectsTo(String pathFile);
 
-    ArrayList<? extends CollectionObject> getObjects();
+    ObjectList<? extends CollectionObject> getObjects();
 
-    ArrayList<? extends CollectionObject> getSortedObjects();
+    ObjectList<? extends CollectionObject> getSortedObjects();
 
     CollectionObject getObject(int objectIndex);
 
