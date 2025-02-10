@@ -3,7 +3,7 @@ package ru.astondevs.projects.hypersort.service.impl;
 import ru.astondevs.projects.hypersort.model.CollectionObject;
 import ru.astondevs.projects.hypersort.model.Human;
 import ru.astondevs.projects.hypersort.service.AbstractService;
-import ru.astondevs.utils.collections.ArrayList;
+import ru.astondevs.utils.collections.ObjectList;
 
 
 public class HumanService extends AbstractService<Human> {
@@ -21,12 +21,12 @@ public class HumanService extends AbstractService<Human> {
     }
 
     @Override
-    public ArrayList<Human> getObjects() {
+    public ObjectList<Human> getObjects() {
         return container;
     }
 
     @Override
-    public ArrayList<Human> getSortedObjects() {
+    public ObjectList<Human> getSortedObjects() {
         return container;
     }
 
