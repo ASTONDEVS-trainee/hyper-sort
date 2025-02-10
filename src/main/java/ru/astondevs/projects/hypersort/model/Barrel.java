@@ -38,8 +38,7 @@ public class Barrel extends CollectionObject implements Comparable<Barrel> {
     public String toString() {
         return "volume: " + volume + "\n" +
                 "storedMaterial: " + storedMaterial + "\n" +
-                "material: " + material + "\n" +
-                "--------------------------------------------------------------------------------";
+                "material: " + material + "\n";
     }
 
 
