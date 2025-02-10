@@ -1,12 +1,10 @@
 package ru.astondevs.projects.hypersort.model;
 
-
-import ru.astondevs.interfaces.Validator;
-
 import java.util.Comparator;
 import java.util.Objects;
 
-public class Human implements Comparable<Human>, Validator {
+
+public class Human extends CollectionObject implements Comparable<Human> {
     private final String gender;
     private final Integer age;
     private final String lastName;

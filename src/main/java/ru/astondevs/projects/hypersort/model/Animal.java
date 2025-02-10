@@ -1,11 +1,10 @@
 package ru.astondevs.projects.hypersort.model;
 
-import ru.astondevs.interfaces.Validator;
-
 import java.util.Comparator;
 import java.util.Objects;
 
-public class Animal implements Comparable<Animal>, Validator {
+
+public class Animal extends CollectionObject implements Comparable<Animal> {
     private final String species;
     private final String eyeColor;
     private final boolean hasFur;
