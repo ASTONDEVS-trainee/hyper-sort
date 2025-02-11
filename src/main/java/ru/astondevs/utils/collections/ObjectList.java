@@ -20,17 +20,12 @@ public class ObjectList<T extends Comparable<T>> {
         this.size = 0;
     }
 
-    public void add(T element) {
-        ensureCapacity(size + 1);
-        elements[size++] = element;
-    }
-
     @SafeVarargs
     public final void add(T... elements) {
         for (T element : elements) {
-            add(element);
+            ensureCapacity(size + 1);
+            elements[size++] = element;
         }
-
     }
 
     public void addAll(T[] elementsToAdd) {
