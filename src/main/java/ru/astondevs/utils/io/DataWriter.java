@@ -1,9 +1,12 @@
-import java.lang.reflect.Field;
+import java.io.IOException;
+import java.lang.invoke.MethodHandles;
+import java.nio.file.*;
 import java.util.List;
+import static java.nio.file.StandardOpenOption.*;
 
 public final class DataWriter {
 
-    private static List objectList;
+    private static Object objectList;
     private static String pathFile;
     private static Boolean append = true;
     private String field;
@@ -16,24 +19,24 @@ public final class DataWriter {
         this.append = append;
     }
 
-    public static void writer(List objectList, String pathFile) {
+    public static void write(List objectList, String pathFile) throws IOException {
+
+        System.out.println("=".repeat(80) + '\n' +
+                getClassName() + '\n' +
+                "=".repeat(80));
+
         for (Object i : objectList) {
-            i.toString();
-            //+ записать
+            System.out.println("-".repeat(80));
+
+            Files.write(Path.of(pathFile), i.toString().getBytes(),
+                    StandardOpenOption.APPEND,
+                    CREATE,
+                    WRITE);
         }
     }
 
-    @Override
-    public String toString() {
-        return "============================================" + '\'' +
-                Object.class.getClass() + '\'' +
-                "============================================" + '\'' +
-//                Object.class.getDeclaredFields() + ": " +  "\n" +
-        //цикл для полей?
-        //+ вывести для них значение?
-        for(Field field : Object.class.getDeclaredFields()) {
-            System.out.println(field.getName() + ": " + field.set(Object value))}; + '\'' +
-                "---------------------------------------------";
+    private static String getClassName() {
+        return MethodHandles.lookup().lookupClass().getName();
     }
 }
 
