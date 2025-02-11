@@ -20,13 +20,20 @@ public class ObjectList<T extends Comparable<T>> {
         this.size = 0;
     }
 
-    @SafeVarargs
-    public final void add(T... elements) {
-        for (T element : elements) {
-            ensureCapacity(size + 1);
-            elements[size++] = element;
-        }
+    public void add(T element) {
+        ensureCapacity(size + 1);
+        elements[size] = element;
+        size++;
     }
+
+    //TODO
+//    @SafeVarargs
+//    public final void add(T... elements) {
+//        for (T element : elements) {
+//            ensureCapacity(size + 1);
+//            elements[size++] = element;
+//        }
+//    }
 
     public void addAll(T[] elementsToAdd) {
         ensureCapacity(size + elementsToAdd.length);
@@ -48,17 +55,19 @@ public class ObjectList<T extends Comparable<T>> {
 
     public T[] sort() {
         @SuppressWarnings("unchecked")
-        T[] arr = (T[]) Arrays.copyOf(elements, size, Comparable[].class); // Копируем массив
+        T[] arr = (T[]) Arrays.copyOf(elements, size, Comparable[].class);
         TimSort.sort(arr);
-        System.arraycopy(arr, 0, elements, 0, size); // Копируем обратно
+        System.arraycopy(arr, 0, elements, 0, size);
         return arr;
     }
 
     public int indexOf(T key) {
         @SuppressWarnings("unchecked")
-        T[] arr = (T[]) Arrays.copyOf(elements, size);
+        T[] arr = (T[]) new Comparable[size];
+        System.arraycopy(elements, 0, arr, 0, size);
         return BinSearch.binarySearch(arr, key);
     }
+
 
     public boolean isEmpty() {
         return size == 0;
