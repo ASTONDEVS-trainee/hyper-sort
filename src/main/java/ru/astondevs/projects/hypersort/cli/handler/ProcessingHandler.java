@@ -7,6 +7,7 @@ import ru.astondevs.projects.hypersort.service.ServiceName;
 import ru.astondevs.projects.hypersort.service.SortMethod;
 import ru.astondevs.utils.collections.ObjectList;
 
+import java.io.IOException;
 import java.util.*;
 
 
@@ -28,7 +29,10 @@ public class ProcessingHandler implements EventHandler {
 
             case Switch.SAVE,
                  Switch.SORTED_SAVE,
-                 Switch.SAVE_PATH -> saveHandler(event);
+                 Switch.SAVE_PATH,
+                 Switch.SORTED_SAVE_PATH,
+                 Switch.SAVE_APPEND,
+                 Switch.SORTED_SAVE_APPEND -> saveHandler(event);
 
             case Switch.SORT,
                  Switch.SORT_BY_INT -> sortHandler(event);
@@ -46,7 +50,7 @@ public class ProcessingHandler implements EventHandler {
         Frame nextFrame = new Frame.Builder()
                 .setSelector(Selector.PROCESSING)
                 .setServiceName(event.getServiceName())
-                .setInputType(InputType.COMMAND)
+                .setInputType(InputType.SELECTOR_COMMAND)
 
                 .setMenuHeader("Что делаем с данными?")
                 .setMenu("[1] Вывести на экран (исходная версию)")
@@ -75,8 +79,9 @@ public class ProcessingHandler implements EventHandler {
         Service service = services.get(event.getServiceName());
 
         switch (switchName) {
-            case Switch.DISPLAY, Switch.DIFF_DISPLAY -> objects = service.getObjects();
-            case Switch.SORTED_DISPLAY ->  objects = service.getSortedObjects();
+            case Switch.DISPLAY,
+                 Switch.DIFF_DISPLAY -> objects = service.getObjects(false);
+            case Switch.SORTED_DISPLAY ->  objects = service.getObjects(true);
 
             default -> throw new RuntimeException("Unknown switch: " + switchName);
         }
@@ -89,7 +94,7 @@ public class ProcessingHandler implements EventHandler {
             }
 
             case Switch.DIFF_DISPLAY -> {
-                sortedObjects = service.getSortedObjects();
+                sortedObjects = service.getObjects(true);
                 StringBuilder builder = new StringBuilder();
 
                 for (int i = 0; i <= objects.size() - 1; i++) {
@@ -126,42 +131,89 @@ public class ProcessingHandler implements EventHandler {
     public Response saveHandler(Event event) {
         Switch switchName = event.getSwitchName();
 
-        Frame.Builder menuFrameBuilder = new Frame.Builder()
-                .setSelector(Selector.PROCESSING)
-                .setServiceName(event.getServiceName())
-                .setInputType(InputType.PAYLOAD_AND_COMMAND)
-
-                .setMenuHeader("Куда сохранить файл?")
-                .setMenu("[-] Назад")
-                .addMenu("[=] Выйти")
-                .setPrompt("[ путь к файлу ]: ");
-
-        Frame actionFrame = new Frame.Builder()
-                .setSelector(Selector.PROCESSING)
-                .setServiceName(event.getServiceName())
-                .build();
-
         Frame nextFrame = switch (switchName) {
-            case Switch.SAVE -> menuFrameBuilder
-                    .setSwitch(Switch.SAVE_PATH)
-                    .build();
+            case Switch.SAVE,
+                 Switch.SORTED_SAVE -> {
 
-            case Switch.SORTED_SAVE -> menuFrameBuilder
-                    .setSwitch(Switch.SORTED_SAVE_PATH)
-                    .build();
+                Frame.Builder nextFrameBuilder = new Frame.Builder()
+                        .setSelector(Selector.PROCESSING)
+                        .setServiceName(event.getServiceName())
+                        .setInputType(InputType.PAYLOAD_AND_COMMAND)
 
-            case Switch.SAVE_PATH, Switch.SORTED_SAVE_PATH -> {
-                String pathFile = event.getPayload().getFirst();
-                Service service = services.get(event.getServiceName());
+                        .setMenuHeader("Куда сохранить файл?")
+                        .setMenu("[-] Назад")
+                        .addMenu("[=] Выйти")
+                        .setPrompt("[ путь к файлу ]: ");
 
                 switch (switchName) {
-                    case Switch.SAVE_PATH -> service.writeObjectsTo(pathFile);
-                    case Switch.SORTED_SAVE_PATH -> service.writeSortedObjectsTo(pathFile);
+                    case Switch.SAVE -> nextFrameBuilder.setSwitch(Switch.SAVE_PATH);
+                    case Switch.SORTED_SAVE -> nextFrameBuilder.setSwitch(Switch.SORTED_SAVE_PATH);
 
                     default -> throw new RuntimeException("Unknown switch: " + switchName);
                 }
 
-                yield actionFrame;
+                yield nextFrameBuilder.build();
+            }
+
+            case Switch.SAVE_PATH,
+                 Switch.SORTED_SAVE_PATH -> {
+
+                Frame.Builder nextFrameBuilder = new Frame.Builder()
+                        .setSelector(Selector.PROCESSING)
+                        .setServiceName(event.getServiceName())
+                        .setInputType(InputType.PAYLOAD_AND_COMMAND)
+                        .setEventPayload(event.getPayload())
+
+                        .setMenuHeader("Перезаписать файл или добавить данные в конец?")
+                        .setMenu("[1] Перезаписать")
+                        .addMenu("[2] Добавить")
+                        .addMenu("[-] Назад")
+                        .addMenu("[=] Выйти")
+                        .setPrompt("[ что делаем ]: ");
+
+                switch (switchName) {
+                    case Switch.SAVE_PATH -> nextFrameBuilder.setSwitch(Switch.SAVE_APPEND);
+                    case Switch.SORTED_SAVE_PATH -> nextFrameBuilder.setSwitch(Switch.SORTED_SAVE_APPEND);
+
+                    default -> throw new RuntimeException("Unknown switch: " + switchName);
+                }
+
+                yield nextFrameBuilder.build();
+            }
+
+            case Switch.SAVE_APPEND,
+                 Switch.SORTED_SAVE_APPEND -> {
+
+                String pathFile = event.getPayload().getFirst();
+                boolean append = Integer.parseInt(event.getPayload().getLast()) != 1;
+
+                Frame.Builder frameBuilder = new Frame.Builder();
+                Service service = services.get(event.getServiceName());
+
+                switch (switchName) {
+                    case Switch.SAVE_APPEND -> {
+                        try {
+                            service.writeObjects(pathFile, false, append);
+                        } catch (IOException e) {
+                            frameBuilder.setServiceMessage(e.getMessage());
+                        }
+                    }
+
+                    case Switch.SORTED_SAVE_APPEND -> {
+                        try {
+                            service.writeObjects(pathFile, true, append);
+                        } catch (IOException e) {
+                            frameBuilder.setServiceMessage(e.getMessage());
+                        }
+                    }
+
+                    default -> throw new RuntimeException("Unknown switch: " + switchName);
+                }
+
+                yield frameBuilder
+                        .setSelector(Selector.PROCESSING)
+                        .setServiceName(event.getServiceName())
+                        .build();
             }
 
             default -> throw new RuntimeException("Unknown switch: " + switchName);

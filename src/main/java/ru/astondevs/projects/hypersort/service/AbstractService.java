@@ -1,7 +1,9 @@
 package ru.astondevs.projects.hypersort.service;
 
 import ru.astondevs.utils.collections.ObjectList;
+import ru.astondevs.utils.io.DataWriter;
 
+import java.io.IOException;
 import java.util.Random;
 
 
@@ -35,13 +37,19 @@ public abstract class AbstractService<T extends Comparable<T>> implements Servic
     }
 
     @Override
-    public void writeObjectsTo(String pathFile) {
-        // DataWriter.write(container, pathFile);
-    }
+    public void writeObjects(String pathFile, boolean isSorted, boolean append) throws IOException {
+        ObjectList<T> objects;
 
-    @Override
-    public void writeSortedObjectsTo(String pathFile) {
-        // DataWriter.write(sortedContainer, pathFile);
+        if (isSorted) {
+            if (sortedContainer.isEmpty()) {
+                sortObjects(SortMethod.DEFAULT);
+            }
+            objects = sortedContainer;
+        } else {
+            objects = container;
+        }
+
+        DataWriter.write(objects, pathFile, append);
     }
 
     @Override
