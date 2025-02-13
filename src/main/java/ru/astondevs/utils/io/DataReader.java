@@ -59,21 +59,21 @@ public class DataReader {
     private static void updateBuilder(Object builder, String key, String value) {
         if (builder instanceof Human.Builder humanBuilder) {
             switch (key) {
-                case "gender" -> humanBuilder.setGender(value);
-                case "age" -> humanBuilder.setAge(Integer.parseInt(value));
-                case "lastName" -> humanBuilder.setLastName(value);
+                case "пол" -> humanBuilder.setGender(value);
+                case "возраст" -> humanBuilder.setAge(Integer.parseInt(value));
+                case "фамилия" -> humanBuilder.setLastName(value);
             }
         } else if (builder instanceof Barrel.Builder barrelBuilder) {
             switch (key) {
-                case "volume" -> barrelBuilder.setVolume(Integer.parseInt(value));
-                case "storedMaterial" -> barrelBuilder.setStoredMaterial(value);
-                case "material" -> barrelBuilder.setMaterial(value);
+                case "объём" -> barrelBuilder.setVolume(Integer.parseInt(value));
+                case "хранимый материал" -> barrelBuilder.setStoredMaterial(value);
+                case "материал" -> barrelBuilder.setMaterial(value);
             }
         } else if (builder instanceof Animal.Builder animalBuilder) {
             switch (key) {
-                case "species" -> animalBuilder.setSpecies(value);
-                case "eyeColor" -> animalBuilder.setEyeColor(value);
-                case "hasFur" -> animalBuilder.setHasFur(Boolean.parseBoolean(value));
+                case "вид" -> animalBuilder.setSpecies(value);
+                case "цвет глаз" -> animalBuilder.setEyeColor(value);
+                case "имеет шерсть" -> animalBuilder.setHasFur(Boolean.parseBoolean(value));
             }
         }
     }

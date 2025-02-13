@@ -66,13 +66,13 @@ public class MainEventHandler implements EventHandler {
             switch (serviceName) {
                 case ServiceName.ANIMAL -> {
                     switch (key) {
-                        case "species" -> animalBuilder.setSpecies(val);
-                        case "eyeColor" -> animalBuilder.setEyeColor(val);
+                        case "вид" -> animalBuilder.setSpecies(val);
+                        case "цвет глаз" -> animalBuilder.setEyeColor(val);
 
-                        case "hasFur" -> {
+                        case "имеет шерсть" -> {
                             switch (val) {
-                                case "true" -> animalBuilder.setHasFur(true);
-                                case "false" -> animalBuilder.setHasFur(false);
+                                case "да" -> animalBuilder.setHasFur(true);
+                                case "нет" -> animalBuilder.setHasFur(false);
 
                                 default -> throw new RuntimeException("Unknown field value: " + val);
                             }
@@ -84,9 +84,9 @@ public class MainEventHandler implements EventHandler {
 
                 case ServiceName.BARREL -> {
                     switch (key) {
-                        case "volume" -> barrelBuilder.setVolume(Integer.parseInt(val));
-                        case "storedMaterial" -> barrelBuilder.setStoredMaterial(val);
-                        case "material" -> barrelBuilder.setMaterial(val);
+                        case "объём" -> barrelBuilder.setVolume(Integer.parseInt(val));
+                        case "хранимый материал" -> barrelBuilder.setStoredMaterial(val);
+                        case "материал" -> barrelBuilder.setMaterial(val);
 
                         default -> throw new RuntimeException("Unknown field key: " + key);
                     }
@@ -94,9 +94,9 @@ public class MainEventHandler implements EventHandler {
 
                 case ServiceName.HUMAN -> {
                     switch (key) {
-                        case "gender" -> humanBuilder.setGender(val);
-                        case "age" -> humanBuilder.setAge(Integer.parseInt(val));
-                        case "lastName" -> humanBuilder.setLastName(val);
+                        case "пол" -> humanBuilder.setGender(val);
+                        case "возраст" -> humanBuilder.setAge(Integer.parseInt(val));
+                        case "фамилия" -> humanBuilder.setLastName(val);
 
                         default -> throw new RuntimeException("Unknown field key: " + key);
                     }

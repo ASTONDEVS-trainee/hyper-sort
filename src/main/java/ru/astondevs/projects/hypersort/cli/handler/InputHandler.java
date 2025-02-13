@@ -50,7 +50,7 @@ public class InputHandler implements EventHandler {
 
                     .setMenuHeader("Какой объект добавляем?")
                     .setMenu("Необходимо ввести поля объекта по следующему образцу:")
-                    .addMenu("gender: male, age: 32, lastName: Иванов")
+                    .addMenu("пол: мужчина, возраст: 32, фамилия: Иванов")
                     .addMenu("[*] Готово")
                     .addMenu("[-] Назад")
                     .addMenu("[=] Выйти")

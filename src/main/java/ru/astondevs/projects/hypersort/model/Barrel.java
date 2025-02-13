@@ -36,9 +36,9 @@ public class Barrel implements CollectionObject, Comparable<Barrel> {
 
     @Override
     public String toString() {
-        return "volume: " + volume + "\n" +
-                "storedMaterial: " + storedMaterial + "\n" +
-                "material: " + material + "\n";
+        return "объём: " + volume + "\n" +
+                "хранимый материал: " + storedMaterial + "\n" +
+                "материал: " + material + "\n";
     }
 
 

@@ -36,9 +36,9 @@ public class Human implements CollectionObject, Comparable<Human> {
 
     @Override
     public String toString() {
-        return "gender: " + gender + "\n" +
-                "age: " + age + "\n" +
-                "lastName: " + lastName + "\n";
+        return "пол: " + gender + "\n" +
+                "возраст: " + age + "\n" +
+                "фамилия: " + lastName + "\n";
     }
 
     @Override
