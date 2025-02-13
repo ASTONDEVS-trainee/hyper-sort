@@ -32,7 +32,7 @@ public class MainEventHandler implements EventHandler {
             case Switch.BACK -> backHandler(ResponseCode.BACK);
             case Switch.BACK_TO_INPUT -> backHandler(ResponseCode.BACK_TO_INPUT);
             case Switch.BACK_TO_CLASS -> backHandler(ResponseCode.BACK_TO_CLASS);
-            case Switch.EXIT -> exitHandler(event);
+            case Switch.EXIT -> exitHandler();
 
             default -> handlers.get(event.getSelector()).route(event);
         };
@@ -42,7 +42,7 @@ public class MainEventHandler implements EventHandler {
         return new Response(code);
     }
 
-    private Response exitHandler(Event event) {
+    private Response exitHandler() {
         Frame finalFrame = new Frame.Builder()
                 .setDescription("Я устал, я ухожу...")
                 .build();
@@ -51,11 +51,10 @@ public class MainEventHandler implements EventHandler {
     }
 
     public static CollectionObject createObject(ServiceName serviceName, String rawData) {
-        CollectionObject object = null;
-
         Animal.Builder animalBuilder = new Animal.Builder();
         Barrel.Builder barrelBuilder = new Barrel.Builder();
         Human.Builder humanBuilder = new Human.Builder();
+
         String[] rawFields = rawData.split(",");
 
         for (String rawField : rawFields) {
