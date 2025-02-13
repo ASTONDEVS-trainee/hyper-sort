@@ -57,7 +57,6 @@ public class ObjectList<T extends Comparable<T>> {
         @SuppressWarnings("unchecked")
         T[] arr = (T[]) Arrays.copyOf(elements, size, Comparable[].class);
         TimSort.sort(arr);
-        System.arraycopy(arr, 0, elements, 0, size);
         return arr;
     }
 
