@@ -5,7 +5,7 @@ import ru.astondevs.projects.hypersort.model.Animal;
 import ru.astondevs.projects.hypersort.service.AbstractService;
 import ru.astondevs.projects.hypersort.service.SortMethod;
 import ru.astondevs.utils.collections.ObjectList;
-import ru.astondevs.utils.io.DataReader;
+import ru.astondevs.projects.hypersort.service.io.DataReader;
 
 import java.io.IOException;
 
