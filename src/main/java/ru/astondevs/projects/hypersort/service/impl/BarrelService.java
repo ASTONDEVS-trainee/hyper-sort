@@ -23,22 +23,19 @@ public class BarrelService extends AbstractService<Barrel> {
     }
 
     @Override
-    public void readObjectsFrom(String pathFile, int limitCountObjects) {
-        container = DataReader.readFromFile(pathFile, Barrel.class);
+    public void readObjects(String pathFile, int limitCountObjects) {
+        container = DataReader.readFromFile(pathFile, Barrel.class, limitCountObjects);
     }
 
     @Override
-    public ObjectList<Barrel> getObjects() {
-        return container;
-    }
-
-    @Override
-    public ObjectList<Barrel> getSortedObjects() {
-        if (sortedContainer.isEmpty()) {
-            sortObjects(SortMethod.DEFAULT);
+    public ObjectList<Barrel> getObjects(boolean isSorted) {
+        if (isSorted) {
+            if (sortedContainer.isEmpty()) {
+                sortObjects(SortMethod.DEFAULT);
+            }
+            return sortedContainer;
         }
-
-        return sortedContainer;
+        return container;
     }
 
     @Override

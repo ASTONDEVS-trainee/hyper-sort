@@ -2,6 +2,6 @@ package ru.astondevs.projects.hypersort.cli.dto;
 
 
 public enum InputType {
-    COMMAND,
+    SELECTOR_COMMAND,
     PAYLOAD_AND_COMMAND
 }

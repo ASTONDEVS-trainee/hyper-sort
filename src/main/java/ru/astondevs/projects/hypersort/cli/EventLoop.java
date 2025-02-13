@@ -16,7 +16,7 @@ public class EventLoop {
         frameStack.push(
                 new Frame.Builder()
                         .setSelector(Selector.CLASS)
-                        .setInputType(InputType.COMMAND)
+                        .setInputType(InputType.SELECTOR_COMMAND)
 
                         .setHeader("Hyper Sort (v1.0)")
                         .setDescription("Программа сортировки массивов данных")

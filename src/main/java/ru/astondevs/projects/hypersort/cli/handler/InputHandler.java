@@ -6,6 +6,7 @@ import ru.astondevs.projects.hypersort.service.Service;
 import ru.astondevs.projects.hypersort.service.ServiceName;
 import ru.astondevs.utils.collections.ObjectList;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -65,7 +66,7 @@ public class InputHandler implements EventHandler {
 
                 Service service = services.get(serviceName);
                 service.addObject(object);
-                objects = service.getObjects();
+                objects = service.getObjects(false);
 
                 for (int i = 0; i <= objects.size() - 1; i++) {
                     objectsData.add(objects.get(i).toString());
@@ -132,11 +133,20 @@ public class InputHandler implements EventHandler {
                 String pathFile = event.getPayload().getFirst();
                 int countObjects = Integer.parseInt(event.getPayload().getLast());
 
+                Frame.Builder frameBuilder = new Frame.Builder();
                 Service service = services.get(event.getServiceName());
-                service.readObjectsFrom(pathFile, countObjects);
 
-                yield new Frame.Builder()
-                        .setSelector(Selector.PROCESSING)
+                try {
+                    service.readObjects(pathFile, countObjects);
+                    frameBuilder.setSelector(Selector.PROCESSING);
+
+                } catch (IOException e) {
+                    frameBuilder
+                            .setSelector(Selector.INPUT)
+                            .setServiceMessage(e.getMessage());
+                }
+
+                yield frameBuilder
                         .setServiceName(event.getServiceName())
                         .build();
             }

@@ -4,7 +4,7 @@ import java.util.Comparator;
 import java.util.Objects;
 
 
-public class Barrel extends CollectionObject implements Comparable<Barrel> {
+public class Barrel implements CollectionObject, Comparable<Barrel> {
     private final Integer volume;
     private final String storedMaterial;
     private final String material;

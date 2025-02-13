@@ -26,9 +26,11 @@ public enum Switch {
 
     // Selector PROCESSING:
     SAVE,
-    SAVE_PATH,
     SORTED_SAVE,
+    SAVE_PATH,
     SORTED_SAVE_PATH,
+    SAVE_APPEND,
+    SORTED_SAVE_APPEND,
     DISPLAY,
     SORTED_DISPLAY,
     DIFF_DISPLAY,

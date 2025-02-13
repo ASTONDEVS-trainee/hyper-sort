@@ -23,22 +23,19 @@ public class AnimalService extends AbstractService<Animal> {
     }
 
     @Override
-    public void readObjectsFrom(String pathFile, int limitCountObjects) {
-        container = DataReader.readFromFile(pathFile, Animal.class);
+    public void readObjects(String pathFile, int limitCountObjects) {
+        container = DataReader.readFromFile(pathFile, Animal.class, limitCountObjects);
     }
 
     @Override
-    public ObjectList<Animal> getObjects() {
-        return container;
-    }
-
-    @Override
-    public ObjectList<Animal> getSortedObjects() {
-        if (sortedContainer.isEmpty()) {
-            sortObjects(SortMethod.DEFAULT);
+    public ObjectList<Animal> getObjects(boolean isSorted) {
+        if (isSorted) {
+            if (sortedContainer.isEmpty()) {
+                sortObjects(SortMethod.DEFAULT);
+            }
+            return sortedContainer;
         }
-
-        return sortedContainer;
+        return container;
     }
 
     @Override

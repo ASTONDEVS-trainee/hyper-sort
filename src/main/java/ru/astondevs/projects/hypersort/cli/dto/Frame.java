@@ -19,6 +19,7 @@ public class Frame {
     private final String description;
     private final String menuHeader;
     private final String menu;
+    private final String serviceMessage;
     private final List<String> payload;
     private final List<String> eventPayload;
     private final String prompt;
@@ -32,6 +33,7 @@ public class Frame {
         this.description = builder.description;
         this.menuHeader = builder.menuHeader;
         this.menu = builder.menu;
+        this.serviceMessage = builder.serviceMessage;
         this.payload = builder.payload;
         this.eventPayload = builder.eventPayload;
         this.prompt = builder.prompt;
@@ -55,6 +57,10 @@ public class Frame {
                         payload.get(i)
                 );
             }
+        }
+
+        if (serviceMessage != null) {
+            System.out.printf("\n%s\n", serviceMessage);
         }
 
         if (menu != null || menuHeader != null) {
@@ -82,7 +88,7 @@ public class Frame {
 
         if (inputType != null) {
             switch (inputType) {
-                case InputType.COMMAND -> eventBuilder
+                case InputType.SELECTOR_COMMAND -> eventBuilder
                         .setSwitchName(selector.select(tty.nextInt()));
 
                 case InputType.PAYLOAD_AND_COMMAND -> {
@@ -120,6 +126,7 @@ public class Frame {
         private String description = null;
         private String menuHeader = null;
         private String menu = null;
+        private String serviceMessage = null;
         private List<String> payload = null;
         private List<String> eventPayload = new ArrayList<>();
         private String prompt = "[ номер меню ]: ";
@@ -201,6 +208,11 @@ public class Frame {
                     menu
             );
 
+            return this;
+        }
+
+        public Builder setServiceMessage(String serviceMessage) {
+            this.serviceMessage = serviceMessage;
             return this;
         }
 

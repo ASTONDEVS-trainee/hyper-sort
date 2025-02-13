@@ -10,7 +10,7 @@ public class ClassHandler implements EventHandler {
         Frame nextFrame = new Frame.Builder()
                 .setSelector(Selector.INPUT)
                 .setServiceName(ServiceName.valueOf(event.getSwitchName().toString()))
-                .setInputType(InputType.COMMAND)
+                .setInputType(InputType.SELECTOR_COMMAND)
 
                 .setMenuHeader("Какие данные будем использовать?")
                 .setMenu("[1] Внести вручную")

@@ -4,7 +4,7 @@ import java.util.Comparator;
 import java.util.Objects;
 
 
-public class Human extends CollectionObject implements Comparable<Human> {
+public class Human implements CollectionObject, Comparable<Human> {
     private final String gender;
     private final Integer age;
     private final String lastName;

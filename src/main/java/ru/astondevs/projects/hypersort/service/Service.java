@@ -6,6 +6,8 @@ import ru.astondevs.projects.hypersort.service.impl.BarrelService;
 import ru.astondevs.projects.hypersort.service.impl.HumanService;
 import ru.astondevs.utils.collections.ObjectList;
 
+import java.io.IOException;
+
 
 public interface Service {
     static Service createService(ServiceName type) {
@@ -17,11 +19,9 @@ public interface Service {
     }
 
     void generateRandomObjects(int count);
-    void readObjectsFrom(String pathFile, int limitCountObjects);
-    void writeObjectsTo(String pathFile);
-    void writeSortedObjectsTo(String pathFile);
-    ObjectList<? extends CollectionObject> getObjects();
-    ObjectList<? extends CollectionObject> getSortedObjects();
+    void readObjects(String pathFile, int limitCountObjects) throws IOException;
+    void writeObjects(String pathFile, boolean isSorted, boolean append) throws IOException;
+    ObjectList<? extends CollectionObject> getObjects(boolean isSorted);;
     CollectionObject getObject(int objectIndex);
     void addObject(CollectionObject object);
     void sortObjects(SortMethod method);

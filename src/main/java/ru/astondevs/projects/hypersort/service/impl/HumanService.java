@@ -23,22 +23,19 @@ public class HumanService extends AbstractService<Human> {
     }
 
     @Override
-    public void readObjectsFrom(String pathFile, int limitCountObjects) {
-        container = DataReader.readFromFile(pathFile, Human.class);
+    public void readObjects(String pathFile, int limitCountObjects) {
+        container = DataReader.readFromFile(pathFile, Human.class, limitCountObjects);
     }
 
     @Override
-    public ObjectList<Human> getObjects() {
-        return container;
-    }
-
-    @Override
-    public ObjectList<Human> getSortedObjects() {
-        if (sortedContainer.isEmpty()) {
-            sortObjects(SortMethod.DEFAULT);
+    public ObjectList<Human> getObjects(boolean isSorted) {
+        if (isSorted) {
+            if (sortedContainer.isEmpty()) {
+                sortObjects(SortMethod.DEFAULT);
+            }
+            return sortedContainer;
         }
-
-        return sortedContainer;
+        return container;
     }
 
     @Override

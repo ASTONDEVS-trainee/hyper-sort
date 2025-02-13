@@ -4,7 +4,7 @@ import java.util.Comparator;
 import java.util.Objects;
 
 
-public class Animal extends CollectionObject implements Comparable<Animal> {
+public class Animal implements CollectionObject, Comparable<Animal> {
     private final String species;
     private final String eyeColor;
     private final boolean hasFur;
