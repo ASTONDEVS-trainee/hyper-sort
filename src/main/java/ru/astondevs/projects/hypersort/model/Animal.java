@@ -35,9 +35,9 @@ public class Animal implements CollectionObject, Comparable<Animal> {
 
     @Override
     public String toString() {
-        return "species: " + species + "\n" +
-                "eyeColor: " + eyeColor + "\n" +
-                "hasFur: " + hasFur + "\n";
+        return "вид: " + species + "\n" +
+                "цвет глаз: " + eyeColor + "\n" +
+                "имеет шерсть: " + hasFur + "\n";
     }
 
     @Override

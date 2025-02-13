@@ -253,7 +253,7 @@ public class ProcessingHandler implements EventHandler {
 
                     .setMenuHeader("Какой объект ищем?")
                     .setMenu("Необходимо ввести поля объекта по следующему образцу:")
-                    .addMenu("gender: male, age: 32, lastName: Иванов")
+                    .addMenu("пол: мужчина, возраст: 32, фамилия: Иванов")
                     .addMenu("")
                     .addMenu("[-] Назад")
                     .addMenu("[=] Выйти")

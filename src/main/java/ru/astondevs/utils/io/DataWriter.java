@@ -18,7 +18,14 @@ public final class DataWriter {
                                                            Boolean append) throws IOException {
 
             Path path = Path.of(pathFile);
-            String className = objectList.get(0).getClass().getSimpleName();
+
+            String className = switch (objectList.get(0).getClass().getSimpleName()) {
+                case "Animal" -> "Животное";
+                case "Barrel" -> "Бочка";
+                case "Human" -> "Человек";
+
+                default -> throw new RuntimeException("Unknown class name");
+            };
 
             String classHeader = String.format(
                     "%s\n%s\n%s\n",
