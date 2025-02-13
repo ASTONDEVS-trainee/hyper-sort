@@ -1,0 +1,242 @@
+package ru.astondevs.projects.hypersort.cli.handler;
+
+import ru.astondevs.projects.hypersort.cli.dto.*;
+import ru.astondevs.projects.hypersort.model.CollectionObject;
+import ru.astondevs.projects.hypersort.service.Service;
+import ru.astondevs.projects.hypersort.service.ServiceName;
+import ru.astondevs.projects.hypersort.service.SortMethod;
+import ru.astondevs.utils.collections.ObjectList;
+
+import java.util.*;
+
+
+public class ProcessingHandler implements EventHandler {
+    private final Map<ServiceName, Service> services;
+
+    public ProcessingHandler(Map<ServiceName, Service> services) {
+        this.services = services;
+    }
+
+    @Override
+    public Response route(Event event) {
+        return switch (event.getSwitchName()) {
+            case Switch.SILENT -> defaultHandler(event);
+
+            case Switch.DISPLAY,
+                 Switch.SORTED_DISPLAY,
+                 Switch.DIFF_DISPLAY -> displayHandler(event);
+
+            case Switch.SAVE,
+                 Switch.SORTED_SAVE,
+                 Switch.SAVE_PATH -> saveHandler(event);
+
+            case Switch.SORT,
+                 Switch.SORT_BY_INT -> sortHandler(event);
+
+            case Switch.FIND,
+                 Switch.INPUT_FIND -> findHandler(event);
+
+            case Switch.CLEAR -> clearHandler(event);
+
+            default -> throw new RuntimeException("Unknown switch: " + event.getSwitchName());
+        };
+    }
+
+    public Response defaultHandler(Event event) {
+        Frame nextFrame = new Frame.Builder()
+                .setSelector(Selector.PROCESSING)
+                .setServiceName(event.getServiceName())
+                .setInputType(InputType.COMMAND)
+
+                .setMenuHeader("Что делаем с данными?")
+                .setMenu("[1] Вывести на экран (исходная версию)")
+                .addMenu("[2] Вывести на экран (отсортированная версия)")
+                .addMenu("[3] Вывести на экран (до и после)")
+                .addMenu("[4] Сохранить в файл (исходная версия)")
+                .addMenu("[5] Сохранить в файл (отсортированная версия)")
+                .addMenu("[6] Сортировать")
+                .addMenu("[7] Сортировать по числовому полю")
+                .addMenu("[8] Найти объект")
+                .addMenu("[9] Удалить данные")
+                .addMenu("[10] Назад к выбору данных")
+                .addMenu("[11] Назад к выбору класса")
+                .addMenu("[12] Выйти")
+                .build();
+
+        return new Response(ResponseCode.DEFAULT, nextFrame);
+    }
+
+    public Response displayHandler(Event event) {
+        List<String> objectsData = new ArrayList<>();
+        ObjectList<? extends CollectionObject> objects;
+        ObjectList<? extends CollectionObject> sortedObjects;
+
+        Switch switchName = event.getSwitchName();
+        Service service = services.get(event.getServiceName());
+
+        switch (switchName) {
+            case Switch.DISPLAY, Switch.DIFF_DISPLAY -> objects = service.getObjects();
+            case Switch.SORTED_DISPLAY ->  objects = service.getSortedObjects();
+
+            default -> throw new RuntimeException("Unknown switch: " + switchName);
+        }
+
+        switch (switchName) {
+            case Switch.DISPLAY, Switch.SORTED_DISPLAY -> {
+                for (int i = 0; i <= objects.size() - 1; i++) {
+                    objectsData.add(objects.get(i).toString());
+                }
+            }
+
+            case Switch.DIFF_DISPLAY -> {
+                sortedObjects = service.getSortedObjects();
+                StringBuilder builder = new StringBuilder();
+
+                for (int i = 0; i <= objects.size() - 1; i++) {
+                    String[] sourceObject = objects.get(i).toString().split("\n");
+                    String[] sortedObject = sortedObjects.get(i).toString().split("\n");
+
+                    for (int j = 0; j < 3; j++) {
+                        int lenSep = 80 - sourceObject[j].length() - sortedObject[j].length();
+
+                        builder.append(sourceObject[j])
+                                .append(" ".repeat(lenSep))
+                                .append(sortedObject[j])
+                                .append("\n");
+                    }
+
+                    objectsData.add(builder.toString());
+                    builder.setLength(0);
+                }
+            }
+
+            default -> throw new RuntimeException("Unknown switch: " + switchName);
+        }
+
+        Frame nextFrame = new Frame.Builder()
+                .setSelector(Selector.PROCESSING)
+                .setServiceName(event.getServiceName())
+                .setHeader(event.getServiceName().toString())
+                .setPayload(objectsData)
+                .build();
+
+        return new Response(ResponseCode.DEFAULT, nextFrame);
+    }
+
+    public Response saveHandler(Event event) {
+        Switch switchName = event.getSwitchName();
+
+        Frame.Builder menuFrameBuilder = new Frame.Builder()
+                .setSelector(Selector.PROCESSING)
+                .setServiceName(event.getServiceName())
+                .setInputType(InputType.PAYLOAD_AND_COMMAND)
+
+                .setMenuHeader("Куда сохранить файл?")
+                .setMenu("[-] Назад")
+                .addMenu("[=] Выйти")
+                .setPrompt("[ путь к файлу ]: ");
+
+        Frame actionFrame = new Frame.Builder()
+                .setSelector(Selector.PROCESSING)
+                .setServiceName(event.getServiceName())
+                .build();
+
+        Frame nextFrame = switch (switchName) {
+            case Switch.SAVE -> menuFrameBuilder
+                    .setSwitch(Switch.SAVE_PATH)
+                    .build();
+
+            case Switch.SORTED_SAVE -> menuFrameBuilder
+                    .setSwitch(Switch.SORTED_SAVE_PATH)
+                    .build();
+
+            case Switch.SAVE_PATH, Switch.SORTED_SAVE_PATH -> {
+                String pathFile = event.getPayload().getFirst();
+                Service service = services.get(event.getServiceName());
+
+                switch (switchName) {
+                    case Switch.SAVE_PATH -> service.writeObjectsTo(pathFile);
+                    case Switch.SORTED_SAVE_PATH -> service.writeSortedObjectsTo(pathFile);
+
+                    default -> throw new RuntimeException("Unknown switch: " + switchName);
+                }
+
+                yield actionFrame;
+            }
+
+            default -> throw new RuntimeException("Unknown switch: " + switchName);
+        };
+
+        return new Response(ResponseCode.DEFAULT, nextFrame);
+    }
+
+    public Response sortHandler(Event event) {
+        Service service = services.get(event.getServiceName());
+        Switch switchName = event.getSwitchName();
+
+        switch (switchName) {
+            case Switch.SORT -> service.sortObjects(SortMethod.DEFAULT);
+            case Switch.SORT_BY_INT -> service.sortObjects(SortMethod.BY_INT_FIELD);
+
+            default -> throw new RuntimeException("Unknown switch: " + switchName);
+        }
+
+        Frame nextFrame = new Frame.Builder()
+                .setSelector(Selector.PROCESSING)
+                .setServiceName(event.getServiceName())
+                .build();
+
+        return new Response(ResponseCode.DEFAULT, nextFrame);
+    }
+
+    public Response findHandler(Event event) {
+        Switch switchName = event.getSwitchName();
+
+        Frame nextFrame = switch (switchName) {
+            case Switch.FIND -> new Frame.Builder()
+                    .setSelector(Selector.PROCESSING)
+                    .setServiceName(event.getServiceName())
+                    .setSwitch(Switch.INPUT_FIND)
+                    .setInputType(InputType.PAYLOAD_AND_COMMAND)
+
+                    .setMenuHeader("Какой объект ищем?")
+                    .setMenu("Необходимо ввести поля объекта по следующему образцу:")
+                    .addMenu("gender: male, age: 32, lastName: Иванов")
+                    .addMenu("")
+                    .addMenu("[-] Назад")
+                    .addMenu("[=] Выйти")
+                    .setPrompt("[ поля объекта ]: ")
+                    .build();
+
+            case Switch.INPUT_FIND -> {
+                ServiceName serviceName = event.getServiceName();
+                String rawData = event.getPayload().getFirst();
+
+                CollectionObject object = MainEventHandler.createObject(serviceName, rawData);
+
+                Service service = services.get(serviceName);
+                int objectIndex = service.searchObject(object);
+                CollectionObject foundObject = service.getObject(objectIndex);
+
+                yield new Frame.Builder()
+                        .setSelector(Selector.PROCESSING)
+                        .setServiceName(serviceName)
+                        .setHeader(serviceName.toString())
+                        .setDescription(String.format("Объект под номером: %d\n", objectIndex + 1))
+                        .setPayload(List.of(foundObject.toString()))
+                        .build();
+            }
+
+            default -> throw new RuntimeException("Unknown switch");
+        };
+
+        return new Response(ResponseCode.DEFAULT, nextFrame);
+    }
+
+    public Response clearHandler(Event event) {
+        Service service = services.get(event.getServiceName());
+        service.clear();
+
+        return new Response(ResponseCode.BACK_TO_CLASS);
+    }
+}

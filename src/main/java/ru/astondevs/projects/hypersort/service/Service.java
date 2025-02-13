@@ -8,36 +8,23 @@ import ru.astondevs.utils.collections.ObjectList;
 
 
 public interface Service {
-    static Service createService(String type) {
+    static Service createService(ServiceName type) {
         return switch (type) {
-            case "Animal" -> new AnimalService();
-            case "Barrel" -> new BarrelService();
-            case "Human" -> new HumanService();
-            default -> throw new RuntimeException("Unknown service name");
+            case ServiceName.ANIMAL -> new AnimalService();
+            case ServiceName.BARREL -> new BarrelService();
+            case ServiceName.HUMAN -> new HumanService();
         };
     }
 
     void generateRandomObjects(int count);
-
-    void readObjectsFrom(String pathFile);
-
+    void readObjectsFrom(String pathFile, int limitCountObjects);
     void writeObjectsTo(String pathFile);
-
     void writeSortedObjectsTo(String pathFile);
-
     ObjectList<? extends CollectionObject> getObjects();
-
     ObjectList<? extends CollectionObject> getSortedObjects();
-
     CollectionObject getObject(int objectIndex);
-
     void addObject(CollectionObject object);
-
-    SortMethod getSortMethod();
-
-    void setSortMethod(SortMethod sortMethod);
-
-    void sortObjects();
-
+    void sortObjects(SortMethod method);
     int searchObject(CollectionObject object);
+    void clear();
 }
