@@ -1,10 +1,6 @@
 package ru.astondevs.projects.hypersort.service;
 
-import ru.astondevs.projects.hypersort.model.CollectionObject;
 import ru.astondevs.utils.collections.ObjectList;
-import ru.astondevs.utils.io.DataReader;
-// import ru.astondevs.utils.io.DataReader;
-// import ru.astondevs.utils.io.DataWriter;
 
 import java.util.Random;
 
@@ -13,7 +9,6 @@ public abstract class AbstractService<T extends Comparable<T>> implements Servic
     protected final Random random = new Random();
     protected ObjectList<T> container = new ObjectList<>();
     protected ObjectList<T> sortedContainer = new ObjectList<>();
-    protected SortMethod sortMethod = SortMethod.DEFAULT;
 
     protected String randomString(int length) {
         String source = "abcdefghijklmnopqrstuvwxyz";
