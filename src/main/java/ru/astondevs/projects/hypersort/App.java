@@ -1,8 +1,11 @@
 package ru.astondevs.projects.hypersort;
 
+import ru.astondevs.projects.hypersort.cli.EventLoop;
+
 
 public class App {
     public static void main(String[] args) {
-        System.err.println("Not implemented");
+        EventLoop eventLoop = new EventLoop();
+        eventLoop.run();
     }
 }
