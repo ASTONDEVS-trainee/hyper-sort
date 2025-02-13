@@ -7,6 +7,8 @@ import ru.astondevs.projects.hypersort.service.SortMethod;
 import ru.astondevs.utils.collections.ObjectList;
 import ru.astondevs.utils.io.DataReader;
 
+import java.io.IOException;
+
 
 public class BarrelService extends AbstractService<Barrel> {
     @Override
@@ -23,7 +25,7 @@ public class BarrelService extends AbstractService<Barrel> {
     }
 
     @Override
-    public void readObjects(String pathFile, int limitCountObjects) {
+    public void readObjects(String pathFile, int limitCountObjects) throws IOException {
         container = DataReader.readFromFile(pathFile, Barrel.class, limitCountObjects);
     }
 

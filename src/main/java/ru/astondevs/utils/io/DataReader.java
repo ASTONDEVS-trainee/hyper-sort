@@ -1,17 +1,20 @@
 package ru.astondevs.utils.io;
 
-import ru.astondevs.projects.hypersort.model.Human;
-import ru.astondevs.projects.hypersort.model.Barrel;
 import ru.astondevs.projects.hypersort.model.Animal;
+import ru.astondevs.projects.hypersort.model.Barrel;
+import ru.astondevs.projects.hypersort.model.Human;
 import ru.astondevs.utils.collections.ObjectList;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
-public class DataReader {
 
-    public static <T extends Comparable<T>> ObjectList<T> readFromFile(String fileName, Class<T> myClass) {
+public class DataReader {
+    public static <T extends Comparable<T>> ObjectList<T> readFromFile(String fileName,
+                                                                       Class<T> myClass,
+                                                                       int limitObjects) throws IOException {
+
         ObjectList<T> objects = new ObjectList<>();
 
         try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
@@ -22,7 +25,11 @@ public class DataReader {
                 line = line.trim();
 
                 if (line.startsWith("-")) {
-                    objects.add(buildObject(builder));
+                    if (objects.size() < limitObjects) {
+                        objects.add(buildObject(builder));
+                    } else {
+                        return objects;
+                    }
                     builder = createBuilder(myClass.getSimpleName());
                 } else {
                     String[] parts = line.split(":", 2);
@@ -34,7 +41,7 @@ public class DataReader {
 
             objects.add(buildObject(builder));
         } catch (IOException e) {
-            System.err.println("Ошибка при чтении файла: " + e.getMessage());
+            throw new IOException("Ошибка при чтении файла: " + e.getMessage());
         }
 
         return objects;
