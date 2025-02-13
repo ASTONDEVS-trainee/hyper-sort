@@ -1,43 +1,52 @@
+package ru.astondevs.utils.io;
+
+import ru.astondevs.utils.collections.ObjectList;
 import java.io.IOException;
-import java.lang.invoke.MethodHandles;
-import java.nio.file.*;
-import java.util.List;
-import static java.nio.file.StandardOpenOption.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+
 
 public final class DataWriter {
+        private static final String CLASS_LINE = "=".repeat(80);
+        private static final String INSTANCE_LINE = "-".repeat(80);
 
-    private static Object objectList;
-    private static String pathFile;
-    private static Boolean append = true;
-    private String field;
+        private DataWriter() {}
 
-    private DataWriter() {
-    }
+        public static <T extends Comparable<T>> void write(ObjectList <T> objectList,
+                                                           String pathFile,
+                                                           Boolean append) throws IOException {
 
-    private DataWriter(String pathFile, Boolean append) {
-        this.pathFile = pathFile;
-        this.append = append;
-    }
+            Path path = Path.of(pathFile);
+            String className = objectList.get(0).getClass().getSimpleName();
 
-    public static void write(List objectList, String pathFile) throws IOException {
+            String classHeader = String.format(
+                    "%s\n%s\n%s\n",
+                    CLASS_LINE,
+                    className,
+                    CLASS_LINE
+            );
 
-        System.out.println("=".repeat(80) + '\n' +
-                getClassName() + '\n' +
-                "=".repeat(80));
+            Files.write(
+                    path,
+                    classHeader.getBytes(),
+                    StandardOpenOption.CREATE,
+                    StandardOpenOption.WRITE,
+                    append ? StandardOpenOption.APPEND : StandardOpenOption.TRUNCATE_EXISTING
+            );
 
-        for (Object i : objectList) {
-            System.out.println("-".repeat(80));
+            for (int i = 0; i <= objectList.size() - 1; i++) {
+                String instanceData = String.format(
+                        i == 0 ? "%s" : INSTANCE_LINE + "\n%s",
+                        objectList.get(i).toString()
+                );
 
-            Files.write(Path.of(pathFile), i.toString().getBytes(),
-                    StandardOpenOption.APPEND,
-                    CREATE,
-                    WRITE);
+                Files.write(
+                        path,
+                        instanceData.getBytes(),
+                        StandardOpenOption.WRITE,
+                        StandardOpenOption.APPEND
+                );
+            }
         }
     }
-
-    private static String getClassName() {
-        return MethodHandles.lookup().lookupClass().getName();
-    }
-}
-
-
