@@ -1,6 +1,8 @@
 package ru.astondevs.projects.hypersort.service;
 
+import ru.astondevs.projects.hypersort.model.CollectionObject;
 import ru.astondevs.utils.collections.ObjectList;
+import ru.astondevs.utils.io.DataReader;
 // import ru.astondevs.utils.io.DataReader;
 // import ru.astondevs.utils.io.DataWriter;
 
@@ -10,7 +12,7 @@ import java.util.Random;
 public abstract class AbstractService<T extends Comparable<T>> implements Service {
     protected final Random random = new Random();
     protected ObjectList<T> container = new ObjectList<>();
-    protected ObjectList<T> sortedContainer;
+    protected ObjectList<T> sortedContainer = new ObjectList<>();
     protected SortMethod sortMethod = SortMethod.DEFAULT;
 
     protected String randomString(int length) {
@@ -38,14 +40,7 @@ public abstract class AbstractService<T extends Comparable<T>> implements Servic
     }
 
     @Override
-    public void readObjectsFrom(String pathFile) {
-        // TODO: ждём реализацию DataReader
-        // container = DataReader.read(pathFile);
-    }
-
-    @Override
     public void writeObjectsTo(String pathFile) {
-        // TODO: ждём реализацию DataWriter
         // DataWriter.write(container, pathFile);
     }
 
@@ -55,18 +50,13 @@ public abstract class AbstractService<T extends Comparable<T>> implements Servic
     }
 
     @Override
-    public SortMethod getSortMethod() {
-        return sortMethod;
+    public void sortObjects(SortMethod method) {
+        sortedContainer.addAll(container.sort());
     }
 
     @Override
-    public void setSortMethod(SortMethod sortMethod) {
-        this.sortMethod = sortMethod;
-    }
-
-    @Override
-    public void sortObjects() {
-        // TODO: ждем метод ArrayList.sort()
-        // sortedContainer = container.sort(sortMethod);
+    public void clear() {
+        container.clear();
+        sortedContainer.clear();
     }
 }

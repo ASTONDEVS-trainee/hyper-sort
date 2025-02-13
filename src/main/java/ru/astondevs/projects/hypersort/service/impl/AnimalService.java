@@ -3,7 +3,9 @@ package ru.astondevs.projects.hypersort.service.impl;
 import ru.astondevs.projects.hypersort.model.CollectionObject;
 import ru.astondevs.projects.hypersort.model.Animal;
 import ru.astondevs.projects.hypersort.service.AbstractService;
+import ru.astondevs.projects.hypersort.service.SortMethod;
 import ru.astondevs.utils.collections.ObjectList;
+import ru.astondevs.utils.io.DataReader;
 
 
 public class AnimalService extends AbstractService<Animal> {
@@ -21,13 +23,22 @@ public class AnimalService extends AbstractService<Animal> {
     }
 
     @Override
+    public void readObjectsFrom(String pathFile, int limitCountObjects) {
+        container = DataReader.readFromFile(pathFile, Animal.class);
+    }
+
+    @Override
     public ObjectList<Animal> getObjects() {
         return container;
     }
 
     @Override
     public ObjectList<Animal> getSortedObjects() {
-        return container;
+        if (sortedContainer.isEmpty()) {
+            sortObjects(SortMethod.DEFAULT);
+        }
+
+        return sortedContainer;
     }
 
     @Override
@@ -42,8 +53,8 @@ public class AnimalService extends AbstractService<Animal> {
 
     @Override
     public int searchObject(CollectionObject object) {
-        if (sortedContainer == null) {
-            sortObjects();
+        if (sortedContainer.isEmpty()) {
+            sortObjects(SortMethod.DEFAULT);
         }
 
         return sortedContainer.indexOf((Animal) object);
