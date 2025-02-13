@@ -1,7 +1,7 @@
 package ru.astondevs.projects.hypersort.service;
 
 import ru.astondevs.utils.collections.ObjectList;
-import ru.astondevs.utils.io.DataWriter;
+import ru.astondevs.projects.hypersort.service.io.DataWriter;
 
 import java.io.IOException;
 import java.util.Random;
