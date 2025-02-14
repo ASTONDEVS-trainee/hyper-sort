@@ -34,7 +34,13 @@ public class EventLoop {
         isRunning = true;
 
         while (isRunning) {
-            Event event = frameStack.getLast().display().waitEvent();
+            Frame currentFrame = frameStack.getLast();
+
+            Event event = currentFrame
+                    .display()
+                    .setRepeatInput(false)
+                    .waitEvent();
+
             Response response = eventHandler.route(event);
 
             switch (response.getCode()) {
@@ -43,6 +49,17 @@ public class EventLoop {
                 case ResponseCode.BACK_TO_CLASS -> backToMenuStep(1);
                 case ResponseCode.BACK_TO_INPUT -> backToMenuStep(2);
                 case ResponseCode.EXIT -> stop(response.getFrame());
+
+                case ResponseCode.REPEAT_INPUT -> frameStack.getLast()
+                        .setRepeatInput(true);
+
+                case ResponseCode.REPEAT_FAIL_INPUT -> frameStack.getLast()
+                        .setRepeatInput(true)
+                        .setIsFailInput(true);
+
+                case ResponseCode.REPEAT_UNSUCCESSFUL_INPUT -> frameStack.getLast()
+                        .setRepeatInput(true)
+                        .setIsUnsuccessfulInput(true);
             }
         }
     }

@@ -33,62 +33,46 @@ public class InputHandler implements EventHandler {
             case Switch.RANDOM,
                  Switch.RANDOM_COUNT_OBJECTS-> randomInput(event);
 
-            default -> throw new RuntimeException("Unknown switch");
+            default -> throw new RuntimeException("Unknown switch: " + event.getSwitchName());
         };
     }
 
     private Response userInput(Event event) {
         Switch switchName = event.getSwitchName();
         ServiceName serviceName = event.getServiceName();
+        ResponseCode responseCode = ResponseCode.DEFAULT;
 
         Frame nextFrame = switch (switchName) {
             case Switch.USER -> new Frame.Builder()
-                    .setSelector(Selector.INPUT)
-                    .setServiceName(event.getServiceName())
-                    .setSwitch(Switch.INPUT_USER)
-                    .setInputType(InputType.PAYLOAD_AND_COMMAND)
-
-                    .setMenuHeader("Какой объект добавляем?")
-                    .setMenu("Необходимо ввести поля объекта по следующему образцу:")
-                    .addMenu("пол: мужчина, возраст: 32, фамилия: Иванов")
-                    .addMenu("[*] Готово")
-                    .addMenu("[-] Назад")
-                    .addMenu("[=] Выйти")
-                    .setPrompt("[ поля объекта ]: ")
-                    .build();
-
-            case Switch.INPUT_USER -> {
-                String rawData = event.getPayload().getLast();
-                CollectionObject object = MainEventHandler.createObject(serviceName, rawData);
-
-                ObjectList<? extends CollectionObject> objects;
-                List<String> objectsData = new ArrayList<>();
-
-                Service service = services.get(serviceName);
-                service.addObject(object);
-                objects = service.getObjects(false);
-
-                for (int i = 0; i <= objects.size() - 1; i++) {
-                    objectsData.add(objects.get(i).toString());
-                }
-
-                yield new Frame.Builder()
                         .setSelector(Selector.INPUT)
                         .setServiceName(serviceName)
                         .setSwitch(Switch.INPUT_USER)
                         .setInputType(InputType.PAYLOAD_AND_COMMAND)
 
-                        .setHeader(serviceName.toString())
-                        .setPayload(objectsData)
-
                         .setMenuHeader("Какой объект добавляем?")
-                        .setMenu("Необходимо ввести поля объекта по следующему образцу:")
-                        .addMenu("gender: male, age: 32, lastName: Иванов")
-                        .addMenu("[*] Готово")
+                        .setExample(serviceName)
+                        .setMenu("[*] Готово")
                         .addMenu("[-] Назад")
                         .addMenu("[=] Выйти")
                         .setPrompt("[ поля объекта ]: ")
                         .build();
+
+            case Switch.INPUT_USER -> {
+                responseCode = ResponseCode.REPEAT_INPUT;
+                String rawData = event.getPayload().getLast();
+                CollectionObject object;
+
+                try {
+                    object = MainEventHandler.createObject(serviceName, rawData);
+                } catch (Exception e) {
+                    responseCode = ResponseCode.REPEAT_FAIL_INPUT;
+                    yield null;
+                }
+
+                Service service = services.get(serviceName);
+                service.addObject(object);
+
+                yield null;
             }
 
             case Switch.COMPLETE -> new Frame.Builder()
@@ -96,10 +80,13 @@ public class InputHandler implements EventHandler {
                     .setServiceName(event.getServiceName())
                     .build();
 
-            default -> throw new RuntimeException("Unknown switch");
+            default -> throw new RuntimeException("Unknown switch: " + switchName);
         };
 
-        return new Response(ResponseCode.DEFAULT, nextFrame);
+        return new Response.Builder()
+                .setCode(responseCode)
+                .setFrame(nextFrame)
+                .build();
     }
 
     private Response fileInput(Event event) {
@@ -154,7 +141,10 @@ public class InputHandler implements EventHandler {
             default -> throw new RuntimeException("Unknown switch");
         };
 
-        return new Response(ResponseCode.DEFAULT, nextFrame);
+        return new Response.Builder()
+                .setCode(ResponseCode.DEFAULT)
+                .setFrame(nextFrame)
+                .build();
     }
 
     private Response randomInput(Event event) {
@@ -188,6 +178,9 @@ public class InputHandler implements EventHandler {
             default -> throw new RuntimeException("Unknown switch");
         };
 
-        return new Response(ResponseCode.DEFAULT, nextFrame);
+        return new Response.Builder()
+                .setCode(ResponseCode.DEFAULT)
+                .setFrame(nextFrame)
+                .build();
     }
 }

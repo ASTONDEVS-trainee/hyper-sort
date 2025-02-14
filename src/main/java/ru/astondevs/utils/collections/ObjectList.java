@@ -1,5 +1,6 @@
 package ru.astondevs.utils.collections;
 
+import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Comparator;
 
@@ -54,8 +55,8 @@ public class ObjectList<T extends Comparable<T>> {
         return size;
     }
 
+    @SuppressWarnings("unchecked")
     public T[] sort() {
-        @SuppressWarnings("unchecked")
         T[] arr = (T[]) Arrays.copyOf(elements, size, Comparable[].class);
         TimSort.sort(arr, true, null);
         return arr;
@@ -64,7 +65,7 @@ public class ObjectList<T extends Comparable<T>> {
     public T[] sort(Comparator<T> comparator) {
         @SuppressWarnings("unchecked")
         T[] arr = (T[]) Arrays.copyOf(elements, size, Comparable[].class);
-        TimSort.sort(arr, false, comparator);
+        TimSort.sortEvenValues(arr, false, comparator);
         return arr;
     }
 

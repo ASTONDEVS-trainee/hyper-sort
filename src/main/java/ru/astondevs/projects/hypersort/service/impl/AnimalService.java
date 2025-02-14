@@ -4,6 +4,7 @@ import ru.astondevs.projects.hypersort.model.CollectionObject;
 import ru.astondevs.projects.hypersort.model.Animal;
 import ru.astondevs.projects.hypersort.service.AbstractService;
 import ru.astondevs.projects.hypersort.service.SortMethod;
+import ru.astondevs.projects.hypersort.service.exceptions.SortMethodException;
 import ru.astondevs.utils.collections.ObjectList;
 import ru.astondevs.projects.hypersort.service.io.DataReader;
 
@@ -38,6 +39,18 @@ public class AnimalService extends AbstractService<Animal> {
             return sortedContainer;
         }
         return container;
+    }
+
+    @Override
+    public void sortObjects(SortMethod method) {
+        switch (method) {
+            case SortMethod.DEFAULT -> sort();
+            case SortMethod.BY_INT_FIELD -> {
+                throw new SortMethodException(
+                        "\tЭта сортировка не доступна для классов без числового поля"
+                );
+            }
+        }
     }
 
     @Override

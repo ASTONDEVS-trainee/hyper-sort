@@ -3,6 +3,7 @@ package ru.astondevs.projects.hypersort.service.impl;
 import ru.astondevs.projects.hypersort.model.CollectionObject;
 import ru.astondevs.projects.hypersort.model.Human;
 import ru.astondevs.projects.hypersort.service.AbstractService;
+import ru.astondevs.projects.hypersort.service.Comparators.AgeHumanComparator;
 import ru.astondevs.projects.hypersort.service.SortMethod;
 import ru.astondevs.utils.collections.ObjectList;
 import ru.astondevs.projects.hypersort.service.io.DataReader;
@@ -17,7 +18,7 @@ public class HumanService extends AbstractService<Human> {
             container.add(
                     new Human.Builder()
                             .setAge(random.nextInt(100))
-                            .setGender(randomString(new String[]{"male", "female"}))
+                            .setGender(randomString(new String[]{"мужчина", "женщина"}))
                             .setLastName(capitalizeString(randomString(8)))
                             .build()
             );
@@ -38,6 +39,14 @@ public class HumanService extends AbstractService<Human> {
             return sortedContainer;
         }
         return container;
+    }
+
+    @Override
+    public void sortObjects(SortMethod method) {
+        switch (method) {
+            case SortMethod.DEFAULT -> sort();
+            case SortMethod.BY_INT_FIELD -> sort(new AgeHumanComparator());
+        }
     }
 
     @Override

@@ -30,16 +30,22 @@ public class MainEventHandler implements EventHandler {
     public Response route(Event event) {
         return switch (event.getSwitchName()) {
             case Switch.BACK -> backHandler(ResponseCode.BACK);
-            case Switch.BACK_TO_INPUT -> backHandler(ResponseCode.BACK_TO_INPUT);
-            case Switch.BACK_TO_CLASS -> backHandler(ResponseCode.BACK_TO_CLASS);
             case Switch.EXIT -> exitHandler();
+            case Switch.BACK_TO_INPUT -> backHandler(ResponseCode.BACK_TO_INPUT);
+
+            case Switch.BACK_TO_CLASS -> {
+                services.get(event.getServiceName()).clear();
+                yield backHandler(ResponseCode.BACK_TO_CLASS);
+            }
 
             default -> handlers.get(event.getSelector()).route(event);
         };
     }
 
     private Response backHandler(ResponseCode code) {
-        return new Response(code);
+        return new Response.Builder()
+                .setCode(code)
+                .build();
     }
 
     private Response exitHandler() {
@@ -47,7 +53,10 @@ public class MainEventHandler implements EventHandler {
                 .setDescription("Я устал, я ухожу...")
                 .build();
 
-        return new Response(ResponseCode.EXIT, finalFrame);
+        return new Response.Builder()
+                .setCode(ResponseCode.EXIT)
+                .setFrame(finalFrame)
+                .build();
     }
 
     public static CollectionObject createObject(ServiceName serviceName, String rawData) {

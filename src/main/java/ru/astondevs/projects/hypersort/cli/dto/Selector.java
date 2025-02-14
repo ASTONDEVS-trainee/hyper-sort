@@ -1,5 +1,7 @@
 package ru.astondevs.projects.hypersort.cli.dto;
 
+import ru.astondevs.projects.hypersort.cli.exceptions.InputSelectorException;
+
 
 public enum Selector {
     CLASS {
@@ -12,8 +14,13 @@ public enum Selector {
 
                 case 4 -> Switch.EXIT;
 
-                default -> throw new RuntimeException("Unknown switch");
+                default -> throw new InputSelectorException("Unknown switch: " + num);
             };
+        }
+
+        @Override
+        public int getMaxValue() {
+            return 4;
         }
     },
 
@@ -28,8 +35,13 @@ public enum Selector {
                 case 4 -> Switch.BACK;
                 case 5 -> Switch.EXIT;
 
-                default -> throw new RuntimeException("Unknown switch");
+                default -> throw new InputSelectorException("Unknown switch: " + num);
             };
+        }
+
+        @Override
+        public int getMaxValue() {
+            return 5;
         }
     },
 
@@ -51,10 +63,16 @@ public enum Selector {
                 case 11 -> Switch.BACK_TO_CLASS;
                 case 12 -> Switch.EXIT;
 
-                default -> throw new RuntimeException("Unknown switch");
+                default -> throw new InputSelectorException("Unknown switch: " + num);
             };
+        }
+
+        @Override
+        public int getMaxValue() {
+            return 12;
         }
     };
 
     public abstract Switch select(Integer num);
+    public abstract  int getMaxValue();
 }

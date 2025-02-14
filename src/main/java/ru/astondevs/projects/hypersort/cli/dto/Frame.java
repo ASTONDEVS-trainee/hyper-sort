@@ -1,8 +1,10 @@
 package ru.astondevs.projects.hypersort.cli.dto;
 
+import ru.astondevs.projects.hypersort.cli.exceptions.InputSelectorException;
 import ru.astondevs.projects.hypersort.service.ServiceName;
 
 import java.util.ArrayList;
+import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 
@@ -10,6 +12,10 @@ import java.util.Scanner;
 public class Frame {
     private static final String HARD_LINE = "=".repeat(80);
     private static final String SOFT_LINE = "-".repeat(80);
+
+    private boolean isRepeatInput = false;
+    private boolean isLastRepeatFail = false;
+    private boolean isLastRepeatUnsuccessful = false;
 
     private final Selector selector;
     private final Switch parentSwitch;
@@ -19,6 +25,7 @@ public class Frame {
     private final String description;
     private final String menuHeader;
     private final String menu;
+    private final String example;
     private final String serviceMessage;
     private final List<String> payload;
     private final List<String> eventPayload;
@@ -33,13 +40,49 @@ public class Frame {
         this.description = builder.description;
         this.menuHeader = builder.menuHeader;
         this.menu = builder.menu;
+        this.example = builder.example;
         this.serviceMessage = builder.serviceMessage;
         this.payload = builder.payload;
         this.eventPayload = builder.eventPayload;
         this.prompt = builder.prompt;
     }
 
+    public Frame setRepeatInput(boolean value) {
+        isRepeatInput = value;
+
+        if (!value) {
+            isLastRepeatFail = false;
+            isLastRepeatUnsuccessful = false;
+        }
+
+        return this;
+    }
+
+    public void setIsFailInput(boolean value) {
+        isLastRepeatFail = value;
+    }
+
+    public void setIsUnsuccessfulInput(boolean value) {
+        isLastRepeatUnsuccessful = value;
+    }
+
     public Frame display() {
+        if (isRepeatInput) {
+            if (isLastRepeatFail) {
+                System.err.println("\tОшибка: некорректные данные");
+            } else if (isLastRepeatUnsuccessful) {
+                System.err.println("\tНет результата :(");
+            }
+
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+                System.err.println(e.getMessage());
+            }
+
+            System.out.print(prompt);
+            return this;
+        }
 
         if (header != null) {
             System.out.printf("\n%s\n\t\t%s\n%s\n", HARD_LINE, header, HARD_LINE);
@@ -70,10 +113,11 @@ public class Frame {
             );
 
             System.out.printf(
-                    "\n%s\n\t\t%s\n%s\n%s\n\n%s",
+                    "\n%s\n\t\t%s\n%s\n%s%s\n\n%s",
                     SOFT_LINE,
                     menuHeader,
                     SOFT_LINE,
+                    example != null ? example : "",
                     menu != null ? menu : "",
                     prompt
             );
@@ -88,8 +132,37 @@ public class Frame {
 
         if (inputType != null) {
             switch (inputType) {
-                case InputType.SELECTOR_COMMAND -> eventBuilder
-                        .setSwitchName(selector.select(tty.nextInt()));
+                case InputType.SELECTOR_COMMAND -> {
+                    boolean isFail = false;
+
+                    while (true) {
+                        try {
+                            if (isFail) {
+                                try {
+                                    // noinspection BusyWait //
+                                    Thread.sleep(200);
+                                } catch (InterruptedException e) {
+                                    System.err.println(e.getMessage());
+                                }
+
+                                System.out.print(prompt);
+                            }
+
+                            int input = Integer.parseInt(tty.nextLine());
+                            eventBuilder.setSwitchName(selector.select(input));
+                            break;
+
+                        } catch (NumberFormatException e) {
+                            System.err.println("\tОшибка: это не число");
+                            isFail = true;
+
+                        } catch (InputSelectorException e) {
+                            int maxNumber = selector.getMaxValue();
+                            System.err.println("\tОшибка: номер меню может быть от 1 до " + maxNumber);
+                            isFail = true;
+                        }
+                    }
+                }
 
                 case InputType.PAYLOAD_AND_COMMAND -> {
                     String rawInput = tty.nextLine();
@@ -106,6 +179,8 @@ public class Frame {
                     }
 
                 }
+
+                default -> throw new RuntimeException("Unknown input type: " + inputType);
             }
         } else {
             eventBuilder.setSwitchName(Switch.SILENT);
@@ -126,6 +201,7 @@ public class Frame {
         private String description = null;
         private String menuHeader = null;
         private String menu = null;
+        private String example = null;
         private String serviceMessage = null;
         private List<String> payload = null;
         private List<String> eventPayload = new ArrayList<>();
@@ -211,6 +287,18 @@ public class Frame {
             return this;
         }
 
+        public Builder setExample(ServiceName serviceName) {
+            String exampleContent = switch (serviceName) {
+                case ServiceName.ANIMAL -> "вид: кошка, цвет глаз: зелёный, имеет шерсть: да\n";
+                case ServiceName.BARREL -> "объём: 200, материал: сталь, хранимый материал: топливо\n";
+                case ServiceName.HUMAN -> "пол: мужчина, возраст: 32, фамилия: Иванов\n";
+            };
+
+            this.example = "Необходимо ввести поля объекта по следующему образцу:\n" + exampleContent;
+            return this;
+        }
+
+        @SuppressWarnings("UnusedReturnValue")
         public Builder setServiceMessage(String serviceMessage) {
             this.serviceMessage = serviceMessage;
             return this;
