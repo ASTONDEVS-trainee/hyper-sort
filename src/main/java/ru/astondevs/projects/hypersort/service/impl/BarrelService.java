@@ -3,6 +3,7 @@ package ru.astondevs.projects.hypersort.service.impl;
 import ru.astondevs.projects.hypersort.model.CollectionObject;
 import ru.astondevs.projects.hypersort.model.Barrel;
 import ru.astondevs.projects.hypersort.service.AbstractService;
+import ru.astondevs.projects.hypersort.service.Comparators.VolumeBarrelComparator;
 import ru.astondevs.projects.hypersort.service.SortMethod;
 import ru.astondevs.utils.collections.ObjectList;
 import ru.astondevs.projects.hypersort.service.io.DataReader;
@@ -38,6 +39,14 @@ public class BarrelService extends AbstractService<Barrel> {
             return sortedContainer;
         }
         return container;
+    }
+
+    @Override
+    public void sortObjects(SortMethod method) {
+        switch (method) {
+            case SortMethod.DEFAULT -> sort();
+            case SortMethod.BY_INT_FIELD -> sort(new VolumeBarrelComparator());
+        }
     }
 
     @Override

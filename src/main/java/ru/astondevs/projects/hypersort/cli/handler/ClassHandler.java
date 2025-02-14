@@ -20,6 +20,9 @@ public class ClassHandler implements EventHandler {
                 .addMenu("[5] Выйти")
                 .build();
 
-        return new Response(ResponseCode.DEFAULT, nextFrame);
+        return new Response.Builder()
+                .setCode(ResponseCode.DEFAULT)
+                .setFrame(nextFrame)
+                .build();
     }
 }

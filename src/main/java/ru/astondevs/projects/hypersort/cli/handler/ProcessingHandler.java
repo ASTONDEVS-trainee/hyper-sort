@@ -5,6 +5,7 @@ import ru.astondevs.projects.hypersort.model.CollectionObject;
 import ru.astondevs.projects.hypersort.service.Service;
 import ru.astondevs.projects.hypersort.service.ServiceName;
 import ru.astondevs.projects.hypersort.service.SortMethod;
+import ru.astondevs.projects.hypersort.service.exceptions.SortMethodException;
 import ru.astondevs.utils.collections.ObjectList;
 
 import java.io.IOException;
@@ -67,7 +68,10 @@ public class ProcessingHandler implements EventHandler {
                 .addMenu("[12] Выйти")
                 .build();
 
-        return new Response(ResponseCode.DEFAULT, nextFrame);
+        return new Response.Builder()
+                .setCode(ResponseCode.DEFAULT)
+                .setFrame(nextFrame)
+                .build();
     }
 
     public Response displayHandler(Event event) {
@@ -125,7 +129,10 @@ public class ProcessingHandler implements EventHandler {
                 .setPayload(objectsData)
                 .build();
 
-        return new Response(ResponseCode.DEFAULT, nextFrame);
+        return new Response.Builder()
+                .setCode(ResponseCode.DEFAULT)
+                .setFrame(nextFrame)
+                .build();
     }
 
     public Response saveHandler(Event event) {
@@ -219,7 +226,10 @@ public class ProcessingHandler implements EventHandler {
             default -> throw new RuntimeException("Unknown switch: " + switchName);
         };
 
-        return new Response(ResponseCode.DEFAULT, nextFrame);
+        return new Response.Builder()
+                .setCode(ResponseCode.DEFAULT)
+                .setFrame(nextFrame)
+                .build();
     }
 
     public Response sortHandler(Event event) {
@@ -228,7 +238,13 @@ public class ProcessingHandler implements EventHandler {
 
         switch (switchName) {
             case Switch.SORT -> service.sortObjects(SortMethod.DEFAULT);
-            case Switch.SORT_BY_INT -> service.sortObjects(SortMethod.BY_INT_FIELD);
+            case Switch.SORT_BY_INT -> {
+                try {
+                    service.sortObjects(SortMethod.BY_INT_FIELD);
+                } catch (SortMethodException e) {
+                    System.err.println(e.getMessage());
+                }
+            }
 
             default -> throw new RuntimeException("Unknown switch: " + switchName);
         }
@@ -238,36 +254,52 @@ public class ProcessingHandler implements EventHandler {
                 .setServiceName(event.getServiceName())
                 .build();
 
-        return new Response(ResponseCode.DEFAULT, nextFrame);
+        return new Response.Builder()
+                .setCode(ResponseCode.DEFAULT)
+                .setFrame(nextFrame)
+                .build();
     }
 
     public Response findHandler(Event event) {
         Switch switchName = event.getSwitchName();
+        ServiceName serviceName = event.getServiceName();
+        ResponseCode responseCode = ResponseCode.DEFAULT;
 
         Frame nextFrame = switch (switchName) {
-            case Switch.FIND -> new Frame.Builder()
-                    .setSelector(Selector.PROCESSING)
-                    .setServiceName(event.getServiceName())
-                    .setSwitch(Switch.INPUT_FIND)
-                    .setInputType(InputType.PAYLOAD_AND_COMMAND)
+            case Switch.FIND -> {
+                yield new Frame.Builder()
+                        .setSelector(Selector.PROCESSING)
+                        .setServiceName(serviceName)
+                        .setSwitch(Switch.INPUT_FIND)
+                        .setInputType(InputType.PAYLOAD_AND_COMMAND)
 
-                    .setMenuHeader("Какой объект ищем?")
-                    .setMenu("Необходимо ввести поля объекта по следующему образцу:")
-                    .addMenu("пол: мужчина, возраст: 32, фамилия: Иванов")
-                    .addMenu("")
-                    .addMenu("[-] Назад")
-                    .addMenu("[=] Выйти")
-                    .setPrompt("[ поля объекта ]: ")
-                    .build();
+                        .setMenuHeader("Какой объект ищем?")
+                        .setExample(serviceName)
+                        .setMenu("[-] Назад")
+                        .addMenu("[=] Выйти")
+                        .setPrompt("[ поля объекта ]: ")
+                        .build();
+            }
 
             case Switch.INPUT_FIND -> {
-                ServiceName serviceName = event.getServiceName();
-                String rawData = event.getPayload().getFirst();
+                String rawData = event.getPayload().getLast();
+                CollectionObject object;
 
-                CollectionObject object = MainEventHandler.createObject(serviceName, rawData);
+                try {
+                    object = MainEventHandler.createObject(serviceName, rawData);
+                } catch (Exception e) {
+                    responseCode = ResponseCode.REPEAT_FAIL_INPUT;
+                    yield null;
+                }
 
                 Service service = services.get(serviceName);
                 int objectIndex = service.searchObject(object);
+
+                if (objectIndex == -1) {
+                    responseCode = ResponseCode.REPEAT_UNSUCCESSFUL_INPUT;
+                    yield null;
+                }
+
                 CollectionObject foundObject = service.getObject(objectIndex);
 
                 yield new Frame.Builder()
@@ -279,16 +311,21 @@ public class ProcessingHandler implements EventHandler {
                         .build();
             }
 
-            default -> throw new RuntimeException("Unknown switch");
+            default -> throw new RuntimeException("Unknown switch: " + switchName);
         };
 
-        return new Response(ResponseCode.DEFAULT, nextFrame);
+        return new Response.Builder()
+                .setCode(responseCode)
+                .setFrame(nextFrame)
+                .build();
     }
 
     public Response clearHandler(Event event) {
         Service service = services.get(event.getServiceName());
         service.clear();
 
-        return new Response(ResponseCode.BACK_TO_CLASS);
+        return new Response.Builder()
+                .setCode(ResponseCode.BACK_TO_CLASS)
+                .build();
     }
 }
