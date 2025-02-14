@@ -103,7 +103,14 @@ public class MainEventHandler implements EventHandler {
 
                 case ServiceName.HUMAN -> {
                     switch (key) {
-                        case "пол" -> humanBuilder.setGender(val);
+                        case "пол" -> {
+                            if (val.equals("мужчина") || val.equals("женщина")) {
+                                humanBuilder.setGender(val);
+                            } else {
+                                throw new RuntimeException("Unknown field value: " + val);
+                            }
+                        }
+
                         case "возраст" -> humanBuilder.setAge(Integer.parseInt(val));
                         case "фамилия" -> humanBuilder.setLastName(val);
 

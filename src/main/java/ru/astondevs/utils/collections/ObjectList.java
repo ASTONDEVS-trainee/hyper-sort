@@ -1,8 +1,8 @@
 package ru.astondevs.utils.collections;
 
-import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Comparator;
+
 
 public class ObjectList<T extends Comparable<T>> {
     private static final int DEFAULT_CAPACITY = 10;
@@ -14,28 +14,11 @@ public class ObjectList<T extends Comparable<T>> {
         this.size = 0;
     }
 
-    public ObjectList(int initialCapacity) {
-        if (initialCapacity < 0) {
-            throw new IllegalArgumentException("Illegal Capacity: " + initialCapacity);
-        }
-        this.elements = new Object[initialCapacity];
-        this.size = 0;
-    }
-
     public void add(T element) {
         ensureCapacity(size + 1);
         elements[size] = element;
         size++;
     }
-
-    //TODO
-//    @SafeVarargs
-//    public final void add(T... elements) {
-//        for (T element : elements) {
-//            ensureCapacity(size + 1);
-//            elements[size++] = element;
-//        }
-//    }
 
     public void addAll(T[] elementsToAdd) {
         ensureCapacity(size + elementsToAdd.length);
@@ -48,6 +31,7 @@ public class ObjectList<T extends Comparable<T>> {
         if (index >= size || index < 0) {
             throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size);
         }
+
         return (T) elements[index];
     }
 
@@ -58,21 +42,24 @@ public class ObjectList<T extends Comparable<T>> {
     @SuppressWarnings("unchecked")
     public T[] sort() {
         T[] arr = (T[]) Arrays.copyOf(elements, size, Comparable[].class);
+
         TimSort.sort(arr, true, null);
         return arr;
     }
 
+    @SuppressWarnings("unchecked")
     public T[] sort(Comparator<T> comparator) {
-        @SuppressWarnings("unchecked")
         T[] arr = (T[]) Arrays.copyOf(elements, size, Comparable[].class);
+
         TimSort.sortEvenValues(arr, false, comparator);
         return arr;
     }
 
+    @SuppressWarnings("unchecked")
     public int indexOf(T key) {
-        @SuppressWarnings("unchecked")
         T[] arr = (T[]) new Comparable[size];
         System.arraycopy(elements, 0, arr, 0, size);
+
         return BinSearch.binarySearch(arr, key);
     }
 
@@ -85,19 +72,18 @@ public class ObjectList<T extends Comparable<T>> {
         for (int i = 0; i < size; i++) {
             elements[i] = null;
         }
-        size = 0;
-    }
 
-    public boolean contains(T element) {
-        return indexOf(element) >= 0;
+        size = 0;
     }
 
     private void ensureCapacity(int minCapacity) {
         if (minCapacity > elements.length) {
             int newCapacity = elements.length * 2;
+
             if (newCapacity < minCapacity) {
                 newCapacity = minCapacity;
             }
+
             elements = Arrays.copyOf(elements, newCapacity);
         }
     }

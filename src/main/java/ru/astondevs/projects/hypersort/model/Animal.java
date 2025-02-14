@@ -44,7 +44,9 @@ public class Animal implements CollectionObject, Comparable<Animal> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
+
         Animal animal = (Animal) o;
+
         return hasFur == animal.hasFur &&
                 Objects.equals(species, animal.species) &&
                 Objects.equals(eyeColor, animal.eyeColor);
@@ -85,10 +87,12 @@ public class Animal implements CollectionObject, Comparable<Animal> {
 
         public Animal build() {
             Animal animal = new Animal(this);
-            if (!animal.validate()) {
-                throw new IllegalArgumentException("Validation is not passed");
+
+            if (animal.validate()) {
+                return animal;
             }
-            return animal;
+
+            throw new IllegalArgumentException("Validation is not passed");
         }
     }
 }

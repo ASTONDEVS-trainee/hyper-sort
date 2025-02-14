@@ -45,6 +45,7 @@ public class Event {
             return this;
         }
 
+        @SuppressWarnings("UnusedReturnValue")
         public Builder setSwitchName(Switch switchName) {
             this.switchName = switchName;
             return this;

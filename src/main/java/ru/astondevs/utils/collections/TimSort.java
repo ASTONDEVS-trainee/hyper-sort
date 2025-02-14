@@ -5,16 +5,16 @@ import ru.astondevs.projects.hypersort.model.Barrel;
 import ru.astondevs.projects.hypersort.model.Human;
 
 import java.lang.reflect.Array;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.List;
+
 
 public class TimSort {
-
     private static final int MIN_RUN_SIZE = 32;
 
-    public static <T extends Comparable<T>> void sort(T[] arr, boolean isUsual, Comparator<T> comparator) {
+    public static <T extends Comparable<T>> void sort(T[] arr,
+                                                      boolean isUsual,
+                                                      Comparator<T> comparator) {
 
         for (int start = 0; start < arr.length; start += MIN_RUN_SIZE) {
             int end = Math.min((start + MIN_RUN_SIZE - 1), (arr.length - 1));
@@ -33,7 +33,12 @@ public class TimSort {
         }
     }
 
-    private static <T extends Comparable<T>> void insertionSort(T[] arr, int start, int end, boolean isUsual, Comparator<T> comparator) {
+    private static <T extends Comparable<T>> void insertionSort(T[] arr,
+                                                                int start,
+                                                                int end,
+                                                                boolean isUsual,
+                                                                Comparator<T> comparator) {
+
         for (int i = start; i <= end; i++) {
             int j = i;
             if (isUsual) {
@@ -54,7 +59,13 @@ public class TimSort {
         }
     }
 
-    private static <T extends Comparable<T>> void merge(T[] array, int left, int mid, int right, boolean isUsual, Comparator<T> comparator) { //слияние отсортированных массивов
+    private static <T extends Comparable<T>> void merge(T[] array,
+                                                        int left,
+                                                        int mid,
+                                                        int right,
+                                                        boolean isUsual,
+                                                        Comparator<T> comparator) {
+
         int len1 = mid - left + 1;
         int len2 = right - mid;
 
@@ -74,6 +85,7 @@ public class TimSort {
                 }
                 k++;
             }
+
         } else {
             while (i < len1 && j < len2) {
                 if (comparator.compare(leftArray[i], rightArray[j]) <= 0) {
@@ -102,17 +114,20 @@ public class TimSort {
     }
 
     private static <T extends Comparable<T>> boolean isEven(T element) {
-
         boolean result = false;
         if (element instanceof Human) result = ((Human) element).getAge() % 2 == 0;
         if (element instanceof Barrel) result = ((Barrel) element).getVolume() % 2 == 0;
+
         if (element instanceof Animal) {
             throw new IllegalArgumentException("Animal have not int value");
         }
+
         return result;
     }
 
-    public static <T extends Comparable<T>> void sortEvenValues(T[] arr, boolean isUsual, Comparator<T> comparator) {
+    public static <T extends Comparable<T>> void sortEvenValues(T[] arr,
+                                                                boolean isUsual,
+                                                                Comparator<T> comparator) {
 
         int evenCount = 0;
 
@@ -121,6 +136,7 @@ public class TimSort {
                 evenCount++;
             }
         }
+
         @SuppressWarnings("uncheked")
         T[] evenValues = (T[]) Array.newInstance(arr.getClass().getComponentType(), evenCount);
 
@@ -135,8 +151,8 @@ public class TimSort {
 
         TimSort.sort(evenValues, isUsual, comparator);
 
-
         int evenIndex = 0;
+
         for (int i = 0; i < arr.length; i++) {
             if (isEven(arr[i])) {
                 arr[i] = evenValues[evenIndex];
@@ -145,4 +161,3 @@ public class TimSort {
         }
     }
 }
-

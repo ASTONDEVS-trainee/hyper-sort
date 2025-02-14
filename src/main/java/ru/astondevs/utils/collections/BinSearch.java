@@ -1,5 +1,6 @@
 package ru.astondevs.utils.collections;
 
+
 public class BinSearch {
     public static <T extends Comparable<T>> int binarySearch(T[] array, T key) {
 
@@ -22,7 +23,7 @@ public class BinSearch {
                 right = mid - 1;
             }
         }
+
         return -1;
     }
 }
-
