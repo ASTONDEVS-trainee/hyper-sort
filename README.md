@@ -2,7 +2,7 @@
 
 <br>
 
-# Hyper Sort `ASTON`
+# Hyper Sort `#ASTON`
 Консольное приложение для сортировки и поиска данных
 
 <br>
