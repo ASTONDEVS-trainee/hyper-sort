@@ -1,6 +1,7 @@
 package ru.astondevs.utils.collections;
 
 import java.util.Arrays;
+import java.util.Comparator;
 
 public class ObjectList<T extends Comparable<T>> {
     private static final int DEFAULT_CAPACITY = 10;
@@ -56,7 +57,14 @@ public class ObjectList<T extends Comparable<T>> {
     public T[] sort() {
         @SuppressWarnings("unchecked")
         T[] arr = (T[]) Arrays.copyOf(elements, size, Comparable[].class);
-        TimSort.sort(arr);
+        TimSort.sort(arr, true, null);
+        return arr;
+    }
+
+    public T[] sort(Comparator<T> comparator) {
+        @SuppressWarnings("unchecked")
+        T[] arr = (T[]) Arrays.copyOf(elements, size, Comparable[].class);
+        TimSort.sort(arr, false, comparator);
         return arr;
     }
 
