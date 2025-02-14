@@ -31,6 +31,7 @@ public class Human implements CollectionObject, Comparable<Human> {
     public boolean validate() {
         return age != null && age > 0 &&
                 gender != null && !gender.isBlank() &&
+                (gender.equals("мужчина") || gender.equals("женщина")) &&
                 lastName != null && !lastName.isBlank();
     }
 
@@ -45,7 +46,9 @@ public class Human implements CollectionObject, Comparable<Human> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
+
         Human human = (Human) o;
+
         return Objects.equals(gender, human.gender) &&
                 Objects.equals(age, human.age) &&
                 Objects.equals(lastName, human.lastName);
@@ -59,8 +62,8 @@ public class Human implements CollectionObject, Comparable<Human> {
     @Override
     public int compareTo(Human o) {
         return Comparator.comparing(Human::getGender)
-                .thenComparing(Human::getAge)
                 .thenComparing(Human::getLastName)
+                .thenComparing(Human::getAge)
                 .compare(this, o);
     }
 
@@ -86,10 +89,12 @@ public class Human implements CollectionObject, Comparable<Human> {
 
         public Human build() {
             Human human = new Human(this);
-            if (!human.validate()) {
-                throw new IllegalArgumentException("Validation is not passed");
+
+            if (human.validate()) {
+                return human;
             }
-            return human;
+
+            throw new IllegalArgumentException("Validation is not passed");
         }
     }
 }

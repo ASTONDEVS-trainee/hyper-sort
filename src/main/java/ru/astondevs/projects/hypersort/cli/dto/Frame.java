@@ -4,7 +4,6 @@ import ru.astondevs.projects.hypersort.cli.exceptions.InputSelectorException;
 import ru.astondevs.projects.hypersort.service.ServiceName;
 
 import java.util.ArrayList;
-import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 
@@ -227,18 +226,14 @@ public class Frame {
             return this;
         }
 
-        public Builder setHeader(String header) {
-            this.header = header;
+        @SuppressWarnings("UnusedReturnValue")
+        public Builder setServiceMessage(String serviceMessage) {
+            this.serviceMessage = serviceMessage;
             return this;
         }
 
-        public Builder addHeader(String header) {
-            this.header = String.format(
-                    "%s\n%s",
-                    this.header,
-                    header
-            );
-
+        public Builder setHeader(String header) {
+            this.header = header;
             return this;
         }
 
@@ -247,28 +242,8 @@ public class Frame {
             return this;
         }
 
-        public Builder addDescription(String description) {
-            this.description = String.format(
-                    "%s\n%s",
-                    this.description,
-                    description
-            );
-
-            return this;
-        }
-
         public Builder setMenuHeader(String menuHeader) {
             this.menuHeader = menuHeader;
-            return this;
-        }
-
-        public Builder addMenuHeader(String menuHeader) {
-            this.menuHeader = String.format(
-                    "%s\n%s",
-                    this.menuHeader,
-                    menuHeader
-            );
-
             return this;
         }
 
@@ -295,12 +270,6 @@ public class Frame {
             };
 
             this.example = "Необходимо ввести поля объекта по следующему образцу:\n" + exampleContent;
-            return this;
-        }
-
-        @SuppressWarnings("UnusedReturnValue")
-        public Builder setServiceMessage(String serviceMessage) {
-            this.serviceMessage = serviceMessage;
             return this;
         }
 

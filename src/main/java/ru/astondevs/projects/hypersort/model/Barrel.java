@@ -46,7 +46,9 @@ public class Barrel implements CollectionObject, Comparable<Barrel> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
+
         Barrel barrel = (Barrel) o;
+
         return Objects.equals(volume, barrel.volume) &&
                 Objects.equals(storedMaterial, barrel.storedMaterial) &&
                 Objects.equals(material, barrel.material);
@@ -59,9 +61,9 @@ public class Barrel implements CollectionObject, Comparable<Barrel> {
 
     @Override
     public int compareTo(Barrel other) {
-        return Comparator.comparing(Barrel::getVolume)
+        return Comparator.comparing(Barrel::getMaterial)
                 .thenComparing(Barrel::getStoredMaterial)
-                .thenComparing(Barrel::getMaterial)
+                .thenComparing(Barrel::getVolume)
                 .compare(this, other);
     }
 
@@ -87,11 +89,12 @@ public class Barrel implements CollectionObject, Comparable<Barrel> {
 
         public Barrel build() {
             Barrel barrel = new Barrel(this);
-            if (!barrel.validate()) {
-                throw new IllegalArgumentException("Validation is not passed");
+
+            if (barrel.validate()) {
+                return barrel;
             }
-            return barrel;
+
+            throw new IllegalArgumentException("Validation is not passed");
         }
     }
 }
-

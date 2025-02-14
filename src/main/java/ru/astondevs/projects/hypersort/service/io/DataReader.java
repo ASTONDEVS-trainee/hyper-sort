@@ -1,8 +1,6 @@
 package ru.astondevs.projects.hypersort.service.io;
 
-import ru.astondevs.projects.hypersort.model.Animal;
-import ru.astondevs.projects.hypersort.model.Barrel;
-import ru.astondevs.projects.hypersort.model.Human;
+import ru.astondevs.projects.hypersort.model.*;
 import ru.astondevs.utils.collections.ObjectList;
 
 import java.io.BufferedReader;
@@ -19,8 +17,8 @@ public class DataReader {
 
         try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
             Object builder = createBuilder(myClass.getSimpleName());
-
             String line;
+
             while ((line = reader.readLine()) != null) {
                 line = line.trim();
 
@@ -30,9 +28,12 @@ public class DataReader {
                     } else {
                         return objects;
                     }
+
                     builder = createBuilder(myClass.getSimpleName());
+
                 } else {
                     String[] parts = line.split(":", 2);
+
                     if (parts.length == 2) {
                         updateBuilder(builder, parts[0].trim(), parts[1].trim());
                     }
@@ -40,8 +41,9 @@ public class DataReader {
             }
 
             objects.add(buildObject(builder));
+
         } catch (IOException e) {
-            throw new IOException("Ошибка при чтении файла: " + e.getMessage());
+            throw new IOException("Read file error: " + e.getMessage());
         }
 
         return objects;
@@ -52,7 +54,8 @@ public class DataReader {
             case "Human" -> new Human.Builder();
             case "Barrel" -> new Barrel.Builder();
             case "Animal" -> new Animal.Builder();
-            default -> throw new IllegalArgumentException("Неизвестный тип: " + type);
+
+            default -> throw new IllegalArgumentException("Unknown type: " + type);
         };
     }
 
@@ -63,12 +66,14 @@ public class DataReader {
                 case "возраст" -> humanBuilder.setAge(Integer.parseInt(value));
                 case "фамилия" -> humanBuilder.setLastName(value);
             }
+
         } else if (builder instanceof Barrel.Builder barrelBuilder) {
             switch (key) {
                 case "объём" -> barrelBuilder.setVolume(Integer.parseInt(value));
                 case "хранимый материал" -> barrelBuilder.setStoredMaterial(value);
                 case "материал" -> barrelBuilder.setMaterial(value);
             }
+
         } else if (builder instanceof Animal.Builder animalBuilder) {
             switch (key) {
                 case "вид" -> animalBuilder.setSpecies(value);
@@ -82,11 +87,14 @@ public class DataReader {
     private static <T> T buildObject(Object builder) {
         if (builder instanceof Human.Builder) {
             return (T) ((Human.Builder) builder).build();
+
         } else if (builder instanceof Barrel.Builder) {
             return (T) ((Barrel.Builder) builder).build();
+
         } else if (builder instanceof Animal.Builder) {
             return (T) ((Animal.Builder) builder).build();
         }
-        throw new IllegalArgumentException("Неизвестный тип builder'а");
+
+        throw new IllegalArgumentException("Unknown builder type");
     }
 }

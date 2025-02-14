@@ -264,10 +264,10 @@ public class ProcessingHandler implements EventHandler {
         Switch switchName = event.getSwitchName();
         ServiceName serviceName = event.getServiceName();
         ResponseCode responseCode = ResponseCode.DEFAULT;
+        List<String> eventPayload = event.getPayload();
 
         Frame nextFrame = switch (switchName) {
-            case Switch.FIND -> {
-                yield new Frame.Builder()
+            case Switch.FIND -> new Frame.Builder()
                         .setSelector(Selector.PROCESSING)
                         .setServiceName(serviceName)
                         .setSwitch(Switch.INPUT_FIND)
@@ -279,10 +279,9 @@ public class ProcessingHandler implements EventHandler {
                         .addMenu("[=] Выйти")
                         .setPrompt("[ поля объекта ]: ")
                         .build();
-            }
 
             case Switch.INPUT_FIND -> {
-                String rawData = event.getPayload().getLast();
+                String rawData = eventPayload.getLast();
                 CollectionObject object;
 
                 try {

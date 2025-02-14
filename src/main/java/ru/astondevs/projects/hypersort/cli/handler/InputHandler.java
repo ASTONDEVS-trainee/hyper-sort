@@ -4,10 +4,8 @@ import ru.astondevs.projects.hypersort.cli.dto.*;
 import ru.astondevs.projects.hypersort.model.CollectionObject;
 import ru.astondevs.projects.hypersort.service.Service;
 import ru.astondevs.projects.hypersort.service.ServiceName;
-import ru.astondevs.utils.collections.ObjectList;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -21,7 +19,9 @@ public class InputHandler implements EventHandler {
 
     @Override
     public Response route(Event event) {
-        return switch (event.getSwitchName()) {
+        Switch switchName = event.getSwitchName();
+
+        return switch (switchName) {
             case Switch.USER,
                  Switch.INPUT_USER,
                  Switch.COMPLETE -> userInput(event);
@@ -33,7 +33,7 @@ public class InputHandler implements EventHandler {
             case Switch.RANDOM,
                  Switch.RANDOM_COUNT_OBJECTS-> randomInput(event);
 
-            default -> throw new RuntimeException("Unknown switch: " + event.getSwitchName());
+            default -> throw new RuntimeException("Unknown switch: " + switchName);
         };
     }
 
@@ -90,10 +90,14 @@ public class InputHandler implements EventHandler {
     }
 
     private Response fileInput(Event event) {
-        Frame nextFrame = switch (event.getSwitchName()) {
+        ServiceName serviceName = event.getServiceName();
+        Switch switchName = event.getSwitchName();
+        List<String> eventPayload = event.getPayload();
+
+        Frame nextFrame = switch (switchName) {
             case Switch.FILE -> new Frame.Builder()
                     .setSelector(Selector.INPUT)
-                    .setServiceName(event.getServiceName())
+                    .setServiceName(serviceName)
                     .setSwitch(Switch.FILE_PATH)
                     .setInputType(InputType.PAYLOAD_AND_COMMAND)
 
@@ -105,10 +109,10 @@ public class InputHandler implements EventHandler {
 
             case Switch.FILE_PATH -> new Frame.Builder()
                     .setSelector(Selector.INPUT)
-                    .setServiceName(event.getServiceName())
+                    .setServiceName(serviceName)
                     .setSwitch(Switch.FILE_COUNT_OBJECTS)
                     .setInputType(InputType.PAYLOAD_AND_COMMAND)
-                    .setEventPayload(event.getPayload())
+                    .setEventPayload(eventPayload)
 
                     .setMenuHeader("Какой максимальный объём можно загрузить?")
                     .setMenu("[-] Назад")
@@ -117,11 +121,11 @@ public class InputHandler implements EventHandler {
                     .build();
 
             case Switch.FILE_COUNT_OBJECTS -> {
-                String pathFile = event.getPayload().getFirst();
-                int countObjects = Integer.parseInt(event.getPayload().getLast());
+                String pathFile = eventPayload.getFirst();
+                int countObjects = Integer.parseInt(eventPayload.getLast());
 
                 Frame.Builder frameBuilder = new Frame.Builder();
-                Service service = services.get(event.getServiceName());
+                Service service = services.get(serviceName);
 
                 try {
                     service.readObjects(pathFile, countObjects);
@@ -134,11 +138,11 @@ public class InputHandler implements EventHandler {
                 }
 
                 yield frameBuilder
-                        .setServiceName(event.getServiceName())
+                        .setServiceName(serviceName)
                         .build();
             }
 
-            default -> throw new RuntimeException("Unknown switch");
+            default -> throw new RuntimeException("Unknown switch: " + switchName);
         };
 
         return new Response.Builder()
@@ -148,12 +152,14 @@ public class InputHandler implements EventHandler {
     }
 
     private Response randomInput(Event event) {
+        ServiceName serviceName = event.getServiceName();
         Switch switchName = event.getSwitchName();
+        List<String> eventPayload = event.getPayload();
 
         Frame nextFrame = switch (switchName) {
             case Switch.RANDOM -> new Frame.Builder()
                     .setSelector(Selector.INPUT)
-                    .setServiceName(event.getServiceName())
+                    .setServiceName(serviceName)
                     .setSwitch(Switch.RANDOM_COUNT_OBJECTS)
                     .setInputType(InputType.PAYLOAD_AND_COMMAND)
 
@@ -164,18 +170,18 @@ public class InputHandler implements EventHandler {
                     .build();
 
             case Switch.RANDOM_COUNT_OBJECTS -> {
-                int countObjects = Integer.parseInt(event.getPayload().getFirst());
+                int countObjects = Integer.parseInt(eventPayload.getFirst());
 
-                Service service = services.get(event.getServiceName());
+                Service service = services.get(serviceName);
                 service.generateRandomObjects(countObjects);
 
                 yield new Frame.Builder()
                         .setSelector(Selector.PROCESSING)
-                        .setServiceName(event.getServiceName())
+                        .setServiceName(serviceName)
                         .build();
             }
 
-            default -> throw new RuntimeException("Unknown switch");
+            default -> throw new RuntimeException("Unknown switch: " + switchName);
         };
 
         return new Response.Builder()

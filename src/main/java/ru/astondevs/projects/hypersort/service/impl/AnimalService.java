@@ -45,11 +45,10 @@ public class AnimalService extends AbstractService<Animal> {
     public void sortObjects(SortMethod method) {
         switch (method) {
             case SortMethod.DEFAULT -> sort();
-            case SortMethod.BY_INT_FIELD -> {
-                throw new SortMethodException(
-                        "\tЭта сортировка не доступна для классов без числового поля"
-                );
-            }
+
+            case SortMethod.BY_INT_FIELD -> throw new SortMethodException(
+                    "\tЭта сортировка не доступна для классов без числового поля"
+            );
         }
     }
 
